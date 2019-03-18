@@ -1,8 +1,8 @@
-// memory_resource                                                    -*-C++-*-
-#ifndef __STD_TEST_RESOURCE_INCLUDED
-#define __STD_TEST_RESOURCE_INCLUDED
+// memory_resource_p1160                                              -*-C++-*-
+#ifndef BLOOMBERGLP_STD_TEST_RESOURCE_P1160_INCLUDED
+#define BLOOMBERGLP_STD_TEST_RESOURCE_P1160_INCLUDED
 
-#include <../include/memory_resource>
+#include <memory_resource>
 
 #include <atomic>
 #include <mutex>
@@ -392,10 +392,10 @@ class [[maybe_unused]] default_resource_guard {
 };
 
 template<class ValueType = byte>
-class polymorphic_allocator_P0339R4 : public polymorphic_allocator<ValueType> {
+class polymorphic_allocator_P0339R5 : public polymorphic_allocator<ValueType> {
     // See Pablo Halpern, Dietmar Kühl (2018). P0339R4 polymorphic_allocator<>
     // as a vocabulary type
-    // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0339r4.pdf
+    // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0339r5.pdf
 
     memory_resource *_Resource()
     {
@@ -410,8 +410,8 @@ public:
 
     using polymorphic_allocator<ValueType>::polymorphic_allocator;
 
-	polymorphic_allocator_P0339R4&
-        operator=(const polymorphic_allocator_P0339R4&) = delete;
+	polymorphic_allocator_P0339R5&
+        operator=(const polymorphic_allocator_P0339R5&) = delete;
 
     [[nodiscard]]
     void *allocate_bytes(const size_t bytes,

@@ -4,6 +4,6 @@
     <ClCompile Include="test_resource.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="memory_resource" />
+    <ClInclude Include="memory_resource_p1160" />
   </ItemGroup>
 </Project>
