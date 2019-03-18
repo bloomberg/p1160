@@ -70,7 +70,7 @@ union AlignedHeader {
 }  // close unnamed namespace
 
 static
-void formatBlock(void *address, int length)
+void formatBlock(void *address, std::size_t length)
     // Format in hex to 'stdout', a block of memory starting at the specified
     // starting 'address' of the specified 'length' (in bytes).  Each line of
     // formatted output will have a maximum of 16 bytes per line, where each
@@ -356,7 +356,8 @@ test_resource::~test_resource()
         if (bytes_in_use() || blocks_in_use()) {
             printf("MEMORY_LEAK");
             if (!m_name_.empty()) {
-                printf(" from %.*s", m_name_.length(), m_name_.data());
+                printf(" from %.*s",
+                       static_cast<int>(m_name_.length()), m_name_.data());
             }
             printf(":\n  Number of blocks in use = %lld\n"
                    "   Number of bytes in use = %lld\n",
@@ -449,7 +450,8 @@ void *test_resource::do_allocate(size_t bytes, size_t alignment)
         printf("test_resource");
 
         if (!m_name_.empty()) {
-            printf(" %.*s", m_name_.length(), m_name_.data());
+            printf(" %.*s",
+                   static_cast<int>(m_name_.length()), m_name_.data());
         }
 
         printf(" [%lld]: Allocated %zu byte%s(aligned %zu) at %p.\n",
@@ -625,7 +627,8 @@ void test_resource::do_deallocate(void *p, size_t bytes, size_t alignment)
         printf("test_resource");
 
         if (!m_name_.empty()) {
-            printf(" %.*s", m_name_.length(), m_name_.data());
+            printf(" %.*s",
+                   static_cast<int>(m_name_.length()), m_name_.data());
         }
 
         printf(" [%lld]: Deallocated %zu byte%s(aligned %zu) at %p.\n",
@@ -655,7 +658,7 @@ void test_resource::print() const noexcept
                "==================================================\n"
                "                TEST RESOURCE %.*s STATE\n"
                "--------------------------------------------------\n",
-               m_name_.length(), m_name_.data());
+               static_cast<int>(m_name_.length()), m_name_.data());
     }
     else {
         printf("\n"

@@ -1,4 +1,4 @@
-#include <stage4/pstring_stage4.h>
+#include <pstring_stage4.h>
 
 #include <supportlib/framer.h>
 #include <supportlib/assert.h>

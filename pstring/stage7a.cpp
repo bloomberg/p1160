@@ -1,4 +1,4 @@
-#include <stage7/pstring_stage7.h>
+#include <pstring_stage7.h>
 
 #include <supportlib/framer.h>
 #include <supportlib/assert.h>

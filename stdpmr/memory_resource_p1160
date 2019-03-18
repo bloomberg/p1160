@@ -354,7 +354,8 @@ void exception_test_loop(test_resource& pmrp, CODE_BLOCK codeBlock)
                 printf("\t*** test_resource_exception"
 				       " from unexpected test resource: %p %.*s ***\n",
                        e.originating_resource(),
-					   e.originating_resource()->name().length(),
+					   static_cast<int>(
+                                    e.originating_resource()->name().length()),
                        e.originating_resource()->name().data());
 				throw;
 			}
