@@ -12,25 +12,21 @@ namespace std::pmr {
 
 namespace {
 
-const unsigned int allocatedMemoryPattern = 0xDEADBEEF; // magic number
-                                                        // identifying
-                                                        // memory allocated by
-                                                        // this resource
+static const unsigned int allocatedMemoryPattern = 0xDEADBEEF;
+    // magic number identifying memory allocated by this resource
 
-const unsigned int deallocatedMemoryPattern = 0xDEADF00D; // 2nd magic number
-                                                          // written over other
-                                                          // magic number upon
-                                                          // deallocation
+static const unsigned int deallocatedMemoryPattern = 0xDEADF00D;
+    // 2nd magic number written over other magic number upon deallocation
 
-const byte scribbledMemoryByte{ 0xA5 };  // byte used to scribble deallocated
-                                         // memory
+static const byte scribbledMemoryByte{ 0xA5 };  // byte used to scribble
+                                                // deallocated memory
 
-const byte paddedMemoryByte{ 0xB1 };     // byte used to write over
-                                         // newly-allocated memory and pads
+static const byte paddedMemoryByte{ 0xB1 };     // byte used to write over
+                                                // newly-allocated memory and
+                                                // padding
 
-static const size_t paddingSize = alignof(max_align_t); // size of the padding
-                                                        // before and after the
-                                                        // user segment
+static const size_t paddingSize = alignof(max_align_t);
+    // size of the padding before and after the user segment
 
 struct Link {
     // This 'struct' holds pointers to the next and preceding allocated
@@ -39,6 +35,12 @@ struct Link {
     long long  m_index_;  // index of this allocation
     Link      *m_next_;   // next 'Link' pointer
     Link      *m_prev_;   // previous 'Link' pointer
+};
+
+struct alignas(std::max_align_t) Padding {
+    // This struct just make 'Header' readable.
+
+    byte m_padding_[paddingSize];
 };
 
 struct Header {
@@ -56,7 +58,7 @@ struct Header {
 
     void         *m_pmr_;           // address of current PMR
 
-    max_align_t   m_padding_;       // padding -- guaranteed to extend to the
+    Padding       m_padding_;       // padding -- guaranteed to extend to the
                                     // end of the struct
 };
 
@@ -641,7 +643,7 @@ void test_resource::do_deallocate(void *p, size_t bytes, size_t alignment)
         std::fflush(stdout);
     }
 
-    m_pmr_->deallocate(head, size);
+    m_pmr_->deallocate(head, sizeof(AlignedHeader) + size + paddingSize);
 }
 
 bool test_resource::do_is_equal(const memory_resource& that) const noexcept
