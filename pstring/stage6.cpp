@@ -1,34 +1,31 @@
+#include <pstring_stage6.h>
+
 #include <supportlib/framer.h>
 #include <supportlib/assert.h>
 
 #include <memory_resource_p1160>
 
-#include <vector>
-#include <string>
-
-void test()
+void test(bool verbose)
 {
-    Framer framer{ "Monitoring" };
+    Framer framer{ "Stage6", verbose };
 
-    std::pmr::test_resource dr{ "default" };
-    std::pmr::test_resource_monitor drm{ dr };
-    std::pmr::default_resource_guard drg{ &dr };
+    std::pmr::test_resource tpmr{ "stage6", verbose };
+    tpmr.set_no_abort(true);
 
-    std::pmr::test_resource tr{ "object" };
+    pstring astring{ "foobar", &tpmr };
+    pstring string2{ "string", &tpmr };
 
-    const char *longstr = "A very very long string that allocates memory";
+    string2 = astring;
 
-    std::pmr::vector<std::pmr::string> vec{ &tr };
-    vec.emplace_back(longstr);
-    vec.emplace_back(longstr);
-
-    ASSERT(drm.is_in_use_same());
-    ASSERT(drm.is_total_same());
+    ASSERT_EQ(astring.str(), "foobar");
+    ASSERT_EQ(string2.str(), "foobar");
 }
 
 int main()
 {
-    test();
+    test(false);
+
+    test(true);
 }
 
 // ----------------------------------------------------------------------------

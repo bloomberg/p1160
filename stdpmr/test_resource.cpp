@@ -1,5 +1,5 @@
 // test_resource.cpp                                                  -*-C++-*-
-#include <memory_resource>
+#include <memory_resource_p1160>
 
 #include <algorithm>  // for min
 #include <cassert>    // for assert
@@ -12,25 +12,21 @@ namespace std::pmr {
 
 namespace {
 
-const unsigned int allocatedMemoryPattern = 0xDEADBEEF; // magic number
-                                                        // identifying
-                                                        // memory allocated by
-                                                        // this resource
+static const unsigned int allocatedMemoryPattern = 0xDEADBEEF;
+    // magic number identifying memory allocated by this resource
 
-const unsigned int deallocatedMemoryPattern = 0xDEADF00D; // 2nd magic number
-                                                          // written over other
-                                                          // magic number upon
-                                                          // deallocation
+static const unsigned int deallocatedMemoryPattern = 0xDEADF00D;
+    // 2nd magic number written over other magic number upon deallocation
 
-const byte scribbledMemoryByte{ 0xA5 };  // byte used to scribble deallocated
-                                         // memory
+static const byte scribbledMemoryByte{ 0xA5 };  // byte used to scribble
+                                                // deallocated memory
 
-const byte paddedMemoryByte{ 0xB1 };     // byte used to write over
-                                         // newly-allocated memory and pads
+static const byte paddedMemoryByte{ 0xB1 };     // byte used to write over
+                                                // newly-allocated memory and
+                                                // padding
 
-static const size_t paddingSize = alignof(max_align_t); // size of the padding
-                                                        // before and after the
-                                                        // user segment
+static const size_t paddingSize = alignof(max_align_t);
+    // size of the padding before and after the user segment
 
 struct Link {
     // This 'struct' holds pointers to the next and preceding allocated
@@ -39,6 +35,12 @@ struct Link {
     long long  m_index_;  // index of this allocation
     Link      *m_next_;   // next 'Link' pointer
     Link      *m_prev_;   // previous 'Link' pointer
+};
+
+struct alignas(std::max_align_t) Padding {
+    // This struct just makes 'Header' readable.
+
+    byte m_padding_[paddingSize];
 };
 
 struct Header {
@@ -56,7 +58,7 @@ struct Header {
 
     void         *m_pmr_;           // address of current PMR
 
-    max_align_t   m_padding_;       // padding -- guaranteed to extend to the
+    Padding       m_padding_;       // padding -- guaranteed to extend to the
                                     // end of the struct
 };
 
@@ -70,7 +72,7 @@ union AlignedHeader {
 }  // close unnamed namespace
 
 static
-void formatBlock(void *address, int length)
+void formatBlock(void *address, std::size_t length)
     // Format in hex to 'stdout', a block of memory starting at the specified
     // starting 'address' of the specified 'length' (in bytes).  Each line of
     // formatted output will have a maximum of 16 bytes per line, where each
@@ -356,7 +358,8 @@ test_resource::~test_resource()
         if (bytes_in_use() || blocks_in_use()) {
             printf("MEMORY_LEAK");
             if (!m_name_.empty()) {
-                printf(" from %.*s", m_name_.length(), m_name_.data());
+                printf(" from %.*s",
+                       static_cast<int>(m_name_.length()), m_name_.data());
             }
             printf(":\n  Number of blocks in use = %lld\n"
                    "   Number of bytes in use = %lld\n",
@@ -449,7 +452,8 @@ void *test_resource::do_allocate(size_t bytes, size_t alignment)
         printf("test_resource");
 
         if (!m_name_.empty()) {
-            printf(" %.*s", m_name_.length(), m_name_.data());
+            printf(" %.*s",
+                   static_cast<int>(m_name_.length()), m_name_.data());
         }
 
         printf(" [%lld]: Allocated %zu byte%s(aligned %zu) at %p.\n",
@@ -625,7 +629,8 @@ void test_resource::do_deallocate(void *p, size_t bytes, size_t alignment)
         printf("test_resource");
 
         if (!m_name_.empty()) {
-            printf(" %.*s", m_name_.length(), m_name_.data());
+            printf(" %.*s",
+                   static_cast<int>(m_name_.length()), m_name_.data());
         }
 
         printf(" [%lld]: Deallocated %zu byte%s(aligned %zu) at %p.\n",
@@ -638,7 +643,7 @@ void test_resource::do_deallocate(void *p, size_t bytes, size_t alignment)
         std::fflush(stdout);
     }
 
-    m_pmr_->deallocate(head, size);
+    m_pmr_->deallocate(head, sizeof(AlignedHeader) + size + paddingSize);
 }
 
 bool test_resource::do_is_equal(const memory_resource& that) const noexcept
@@ -655,7 +660,7 @@ void test_resource::print() const noexcept
                "==================================================\n"
                "                TEST RESOURCE %.*s STATE\n"
                "--------------------------------------------------\n",
-               m_name_.length(), m_name_.data());
+               static_cast<int>(m_name_.length()), m_name_.data());
     }
     else {
         printf("\n"
