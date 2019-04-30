@@ -38,7 +38,7 @@ struct Link {
 };
 
 struct alignas(std::max_align_t) Padding {
-    // This struct just makes 'Header' readable.
+    // This struct just make 'Header' readable.
 
     byte m_padding_[paddingSize];
 };
