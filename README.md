@@ -15,13 +15,14 @@ it should be compatible with all variants including the *Community* variant.
 
 To use gcc (at the time of writing, 2019.Apr.20), in the word of Jonathan Wakely: See https://gcc.gnu.org/wiki/InstallingGCC and replace gcc-4.6.0.tar.gz with a snapshot such as https://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/
 
-The latest code uses cmake to generate the build system, so you will need cmake.  Haven't yet tried with Visual Studio cmake support, I will update here when I do.  
-  
+The latest code uses cmake to generate the build system, so you will need cmake.  Haven't yet tried with Visual Studio cmake support, I will update here when I do.
+
 clang+libc++ does not yet have a standard `pmr` implementation.  I will attempt later to see if I can make the code work with `<experimental/memory_resource>` that libc++ implements currently (2019.Apr.30.)
 
 # How to Understand the Code
 
-The [Visual Studio project](pmr_test_resource.sln) consists of 5 major parts:
+The repository consists of 5 major parts:
+
   * supportlib -- macros and printing helpers (static lib)
   * stdpmr -- the implementations of the proposed types and the exception testing algorithm (static lib)
   * pstring -- a series of examples of testing and fixing an imaginary (and quite pathological) string class (executables)
