@@ -47,7 +47,7 @@ check_cxx_source_runs(
    "
 
   P1160_HAS_CPP17_MEMORY_RESOURCE
-2)
+)
 
 check_cxx_source_runs(
    "#include <experimental/memory_resource>
