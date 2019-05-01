@@ -66,12 +66,16 @@ public:
 
     test_resource();
     explicit test_resource(memory_resource *pmrp);
+    explicit test_resource(const char *name);
     explicit test_resource(string_view name);
     explicit test_resource(bool verbose);
     test_resource(string_view name, memory_resource *pmrp);
+    test_resource(const char *name, memory_resource *pmrp);
     test_resource(bool verbose, memory_resource *pmrp);
     test_resource(string_view name, bool verbose);
+    test_resource(const char *name, bool verbose);
     test_resource(string_view name, bool verbose, memory_resource *pmrp);
+    test_resource(const char *name, bool verbose, memory_resource *pmrp);
 
     ~test_resource();
 
@@ -229,16 +233,16 @@ public:
 
 class test_resource_exception : public ::std::bad_alloc {
 
-	test_resource *m_originating_;
+    test_resource *m_originating_;
     size_t         m_size_;
     size_t         m_alignment_;
 
   public:
     test_resource_exception(test_resource *originating,
-	                        size_t         size,
-							size_t         alignment) noexcept
+                            size_t         size,
+                            size_t         alignment) noexcept
     : m_originating_(originating)
-	, m_size_(size)
+    , m_size_(size)
     , m_alignment_(alignment)
     {
     }
@@ -248,10 +252,10 @@ class test_resource_exception : public ::std::bad_alloc {
         return "std::pmr::test_resource_exception";
     }
 
-	test_resource *originating_resource() const noexcept
-	{
-	    return m_originating_;
-	}
+    test_resource *originating_resource() const noexcept
+    {
+        return m_originating_;
+    }
 
     size_t size() const noexcept
     {
@@ -350,15 +354,15 @@ void exception_test_loop(test_resource& pmrp, CODE_BLOCK codeBlock)
             pmrp.set_allocation_limit(-1);
             return;
         } catch (const test_resource_exception& e) {
-			if (e.originating_resource() != &pmrp) {
+            if (e.originating_resource() != &pmrp) {
                 printf("\t*** test_resource_exception"
-				       " from unexpected test resource: %p %.*s ***\n",
+                       " from unexpected test resource: %p %.*s ***\n",
                        e.originating_resource(),
-					   static_cast<int>(
+                       static_cast<int>(
                                     e.originating_resource()->name().length()),
                        e.originating_resource()->name().data());
-				throw;
-			}
+                throw;
+            }
             else if (pmrp.is_verbose()) {
                 printf("\t*** test_resource_exception: "
                        "alloc limit = %lld, last alloc size = %zu, "
@@ -394,7 +398,7 @@ class [[maybe_unused]] default_resource_guard {
 
 template<class ValueType = byte>
 class polymorphic_allocator_P0339R5 : public polymorphic_allocator<ValueType> {
-    // See Pablo Halpern, Dietmar Kühl (2018). P0339R4 polymorphic_allocator<>
+    // See Pablo Halpern, Dietmar Kuehl (2018). P0339R5 polymorphic_allocator<>
     // as a vocabulary type
     // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0339r5.pdf
 
@@ -404,29 +408,29 @@ class polymorphic_allocator_P0339R5 : public polymorphic_allocator<ValueType> {
     }
 
 public:
-	template<class>
-		friend class polymorphic_allocator_P0339R4;
+    template<class>
+        friend class polymorphic_allocator_P0339R4;
 
-	using value_type = ValueType;
+    using value_type = ValueType;
 
     using polymorphic_allocator<ValueType>::polymorphic_allocator;
 
-	polymorphic_allocator_P0339R5&
+    polymorphic_allocator_P0339R5&
         operator=(const polymorphic_allocator_P0339R5&) = delete;
 
     [[nodiscard]]
     void *allocate_bytes(const size_t bytes,
-	                     const size_t alignment = alignof(max_align_t))
-	{
-		return (_Resource()->allocate(bytes, alignment));
-	}
+                         const size_t alignment = alignof(max_align_t))
+    {
+        return (_Resource()->allocate(bytes, alignment));
+    }
 
-	void deallocate_bytes(void *const  ptr,
+    void deallocate_bytes(void *const  ptr,
                           const size_t bytes,
                           const size_t alignment = alignof(max_align_t))
-	{
-		return (_Resource()->deallocate(ptr, bytes, alignment));
-	}
+    {
+        return (_Resource()->deallocate(ptr, bytes, alignment));
+    }
 
     template <class ObjectType>
     [[nodiscard]] ObjectType *allocate_object(const size_t count = 1)

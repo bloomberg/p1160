@@ -303,6 +303,11 @@ test_resource::test_resource(string_view name)
 {
 }
 
+test_resource::test_resource(const char *name)
+: test_resource(string_view(name), false)
+{
+}
+
 test_resource::test_resource(bool verbose)
 : test_resource(string_view{}, verbose)
 {
@@ -313,6 +318,11 @@ test_resource::test_resource(string_view name, memory_resource *pmrp)
 {
 }
 
+test_resource::test_resource(const char *name, memory_resource *pmrp)
+: test_resource(string_view(name), false, pmrp)
+{
+}
+
 test_resource::test_resource(bool verbose, memory_resource *pmrp)
 : test_resource(string_view{}, verbose, pmrp)
 {
@@ -320,6 +330,11 @@ test_resource::test_resource(bool verbose, memory_resource *pmrp)
 
 test_resource::test_resource(string_view name, bool verbose)
 : test_resource(name, verbose, new_delete_resource())
+{
+}
+
+test_resource::test_resource(const char *name, bool verbose)
+: test_resource(string_view(name), verbose, new_delete_resource())
 {
 }
 
@@ -334,6 +349,13 @@ test_resource::test_resource(string_view      name,
                                                    sizeof(test_resource_list));
     m_list_->d_head_p = nullptr;
     m_list_->d_tail_p = nullptr;
+}
+
+test_resource::test_resource(const char      *name,
+                             bool             verbose,
+                             memory_resource *pmrp)
+: test_resource(string_view(name), verbose, pmrp)
+{
 }
 
 test_resource::~test_resource()
