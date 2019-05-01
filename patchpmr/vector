@@ -1,37 +1,22 @@
-#include <supportlib/framer.h>
-#include <supportlib/assert.h>
+// patchpmr/vector                                                    -*-C++-*-
+#ifndef BLOOMBERGLP_PATCHPMR_INCLUDING_STD_HEADERS
 
-#include <memory_resource_p1160>
+#ifndef BLOOMBERGLP_PATCHPMR_VECTOR_INCLUDED
+#define BLOOMBERGLP_PATCHPMR_VECTOR_INCLUDED
 
-#include <deque>
-#include <string>
+#define BLOOMBERGLP_PATCHPMR_INCLUDING_STD_HEADERS
+#include <experimental/vector>
+#undef BLOOMBERGLP_PATCHPMR_INCLUDING_STD_HEADERS
 
-void test(bool verbose)
-{
-    Framer framer{ "Exception Testing", verbose };
+namespace std::pmr {  using experimental::pmr::vector;  }
+#endif
 
-    std::pmr::test_resource tpmr{ "tester", verbose };
-    const char *longstr = "A very very long string that allocates memory";
-
-    std::pmr::exception_test_loop(tpmr,
-                                  [longstr](std::pmr::memory_resource& pmrp) {
-        std::pmr::deque<std::pmr::string> deq{ &pmrp };
-        deq.emplace_back(longstr);
-        deq.emplace_back(longstr);
-
-        ASSERT_EQ(deq.size(), 2);
-    });
-}
-
-int main()
-{
-    test(false);
-
-    test(true);
-}
+#else
+#   include_next <vector>
+#endif
 
 // ----------------------------------------------------------------------------
-// Copyright 2018 Bloomberg Finance L.P.
+// Copyright 2019 Bloomberg Finance L.P.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
