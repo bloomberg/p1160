@@ -12,9 +12,9 @@ void test(bool verbose)
     std::pmr::test_resource tpmr{ "stage4", verbose };
     tpmr.set_no_abort(true);
 
-    pstring astring{ "foobar", &tpmr };
+    pstring astring{ "barfool", &tpmr };
 
-    ASSERT_EQ(astring.str(), "foobar");
+    ASSERT_EQ(astring.str(), "barfool");
 }
 
 int main()
@@ -25,7 +25,7 @@ int main()
 }
 
 // ----------------------------------------------------------------------------
-// Copyright 2018 Bloomberg Finance L.P.
+// Copyright 2019 Bloomberg Finance L.P.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
