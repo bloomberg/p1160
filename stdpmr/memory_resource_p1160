@@ -124,7 +124,7 @@ public:
         return m_name_;
     }
 
-    memory_resource* upstream_resource() const noexcept
+    memory_resource *upstream_resource() const noexcept
     {
         return m_pmr_;
     }
@@ -327,7 +327,7 @@ class test_resource_monitor {
         return m_monitored_.total_blocks() != m_initial_total_;
     }
 
-    long long delta_block_in_use() const noexcept
+    long long delta_blocks_in_use() const noexcept
     {
         return m_monitored_.blocks_in_use() - m_initial_in_use_;
     }
