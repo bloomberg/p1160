@@ -77,7 +77,7 @@ pstring::pstring(pstring&& other, allocator_type allocator)
         other.m_buffer_ = nullptr;
     }
     else {
-        m_buffer_ = m_allocator_.allocate_object<char>(m_length_ + 1);
+        m_buffer_ = 0;
         std::strcpy(m_buffer_, other.m_buffer_);
     }
 }
@@ -85,7 +85,7 @@ pstring::pstring(pstring&& other, allocator_type allocator)
 inline
 pstring::~pstring()
 {
-    m_allocator_.deallocate_object(m_buffer_, m_length_ + 1);
+    m_allocator_.deallocate_object(m_buffer_, m_length_ ? m_length_ + 1 : 0);
 }
 
 inline
@@ -96,7 +96,7 @@ pstring& pstring::operator=(const pstring& rhs)
     }
 
     char *buff = m_allocator_.allocate_object<char>(rhs.m_length_ + 1);
-    m_allocator_.deallocate_object(m_buffer_, m_length_ + 1);
+    m_allocator_.deallocate_object(m_buffer_, m_length_ ? m_length_ + 1 : 0);
     m_buffer_ = buff;
     std::strcpy(m_buffer_, rhs.m_buffer_);
     m_length_ = rhs.m_length_;
