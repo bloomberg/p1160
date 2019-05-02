@@ -31,3 +31,12 @@ target_link_libraries(stage7a stdpmr supportlib)
 
 add_executable(stage8 stage8.cpp pstring_stage8.h)
 target_link_libraries(stage8 stdpmr supportlib)
+
+add_executable(stage8a stage8a.cpp pstring_stage8.h)
+target_link_libraries(stage8a stdpmr supportlib)
+
+add_executable(stage9 stage9.cpp pstring_stage9.h)
+target_link_libraries(stage9 stdpmr supportlib)
+
+add_executable(last last.cpp pstring_last.h)
+target_link_libraries(last stdpmr supportlib)
