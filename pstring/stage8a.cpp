@@ -1,38 +1,45 @@
 #include <supportlib/framer.h>
 #include <supportlib/assert.h>
 
+#include <pstring_stage8.h>
+
 #include <memory_resource_p1160>
 
-#include <vector>
-#include <string>
+#include <utility>
 
-void test()
+void test(bool verbose)
 {
-    Framer framer{ "Monitoring" };
+    Framer framer{ "Monitoring", verbose };
 
-    std::pmr::test_resource dr{ "default" };
-    std::pmr::test_resource_monitor drm{ dr };
+    std::pmr::test_resource           dr{ "default" };
+    std::pmr::test_resource_monitor  drm{ dr };
     std::pmr::default_resource_guard drg{ &dr };
+    dr.set_verbose(verbose);
 
-    std::pmr::test_resource tr{ "object" };
+    std::pmr::test_resource          tr{ "object" };
+    std::pmr::test_resource_monitor trm{ tr };
+    tr.set_verbose(verbose);
 
-    const char *longstr = "A very very long string that allocates memory";
+    pstring astring{ "barfool", &tr };
+    ASSERT   (trm.is_total_up());
+    ASSERT_EQ(trm.delta_blocks_in_use(), 1);
+    trm.reset();
 
-    std::pmr::vector<std::pmr::string> vec{ &tr };
-    vec.emplace_back(longstr);
-    vec.emplace_back(longstr);
+    pstring mstring{ std::move(astring) };
 
-    ASSERT(drm.is_in_use_same());
-    ASSERT(drm.is_total_same());
+    ASSERT(drm.is_in_use_same()); // Did not allocate`bstring` with this
+    ASSERT(drm.is_total_same());  // Did not allocate /anything/ with this
 }
 
 int main()
 {
-    test();
+    test(false);
+
+    test(true);
 }
 
 // ----------------------------------------------------------------------------
-// Copyright 2018 Bloomberg Finance L.P.
+// Copyright 2019 Bloomberg Finance L.P.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

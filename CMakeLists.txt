@@ -85,5 +85,4 @@ get_filename_component(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} ABSOLU
 add_subdirectory(stdpmr)
 add_subdirectory(supportlib)
 add_subdirectory(pstring)
-add_subdirectory(monitoring)
 add_subdirectory(exception_testing)

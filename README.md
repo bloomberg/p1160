@@ -26,7 +26,6 @@ The repository consists of 5 major parts:
   * supportlib -- macros and printing helpers (static lib)
   * stdpmr -- the implementations of the proposed types and the exception testing algorithm (static lib)
   * pstring -- a series of examples of testing and fixing an imaginary (and quite pathological) string class (executables)
-  * monitoring -- an example of test resource monitoring and replacing the default resource with a test resource
   * exception_testing -- an example using the `exception_test_loop`
   * patchpmr -- hacks to make clang with libc++ and older GNU libraries with experimental support work
 
