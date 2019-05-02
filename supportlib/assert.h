@@ -4,15 +4,21 @@
 
 #include <iostream>
 
+#ifndef SUPPORTLIB_ASSERT_REGISTER_ERROR
+#define SUPPORTLIB_ASSERT_REGISTER_ERROR
+#endif
+
 #define ASSERT(a)                                                             \
     if (!a) {                                                                 \
         std::cout << #a << " != true\n";                                      \
+        SUPPORTLIB_ASSERT_REGISTER_ERROR                                      \
     }
 
 #define ASSERT_EQ(a, b)                                                       \
     if (a != b) {                                                             \
         std::cout << #a << " != " << #b << '\n';                              \
         std::cout << a << " != " << b << '\n';                                \
+        SUPPORTLIB_ASSERT_REGISTER_ERROR                                      \
     }
 
 #endif
