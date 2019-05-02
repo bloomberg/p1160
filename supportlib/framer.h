@@ -12,7 +12,7 @@ struct Framer {
     {
         std::cout << "\n----------------- " << title;
         if (verbose) {
-            std::cout << "(verbose)";
+            std::cout << " (verbose)";
         }
         std::cout << " -----------------\n";
     }
