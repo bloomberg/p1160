@@ -288,6 +288,43 @@ void printList(const test_resource_list& list)
     }
 }
 
+static
+memory_resource* local_malloc_free_resource()
+{
+    struct malloc_free_resource : memory_resource {
+        [[nodiscard]] void *
+            do_allocate(size_t bytes, size_t alignment) override
+        {
+            // While this class is local, there is no need to check the
+            // alignment, as we never ask for overaligned memory
+            //if (alignment > alignof(max_align_t)) {
+            //    throw bad_alloc();
+            //}
+            void *rv = malloc(bytes);
+            if (nullptr == rv) {
+                throw bad_alloc();
+            }
+            return rv;
+        }
+
+        void do_deallocate(void                    *p,
+                           [[maybe_unused]] size_t  bytes,
+                            [[maybe_unused]] size_t alignment) override
+        {
+            free(p);
+        }
+
+        bool do_is_equal(const memory_resource& that) const noexcept override
+        {
+            return nullptr != dynamic_cast<const malloc_free_resource*>(&that);
+        }
+    };
+
+    static malloc_free_resource instance;
+    return &instance;
+}
+
+
 test_resource::test_resource()
 : test_resource(string_view{}, false)
 {
@@ -329,12 +366,12 @@ test_resource::test_resource(bool verbose, memory_resource *pmrp)
 }
 
 test_resource::test_resource(string_view name, bool verbose)
-: test_resource(name, verbose, new_delete_resource())
+: test_resource(name, verbose, local_malloc_free_resource())
 {
 }
 
 test_resource::test_resource(const char *name, bool verbose)
-: test_resource(string_view(name), verbose, new_delete_resource())
+: test_resource(string_view(name), verbose, local_malloc_free_resource())
 {
 }
 
