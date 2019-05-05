@@ -401,6 +401,11 @@ void *test_resource::do_allocate(size_t bytes, size_t alignment)
     long long allocationIndex = m_allocations_.fetch_add(1,
                                                          memory_order_relaxed);
 
+    if (alignment > alignof(max_align_t)) {
+        // Over-aligned allocations are not currently supported.
+        throw bad_alloc();
+    }
+
     if (0 <= allocation_limit()) {
         if (0 > m_allocation_limit_.fetch_add(-1, memory_order_relaxed) - 1) {
             throw test_resource_exception(this, bytes, alignment);
