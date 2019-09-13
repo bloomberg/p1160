@@ -449,15 +449,6 @@ void *test_resource::do_allocate(size_t bytes, size_t alignment)
         }
     }
 
-    if (0 == bytes) {
-        m_last_allocated_num_bytes_.store(static_cast<long long>(0),
-                                          memory_order_relaxed);
-        m_last_allocated_alignment_.store(static_cast<long long>(alignment),
-                                          memory_order_relaxed);
-        m_last_allocated_address_.store(nullptr, memory_order_relaxed);
-        return nullptr;                                               // RETURN
-    }
-
     AlignedHeader *head = (AlignedHeader *)m_pmr_->allocate(
                                   sizeof(AlignedHeader) + bytes + paddingSize);
     if (!head) {

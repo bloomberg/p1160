@@ -267,3 +267,6 @@ CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 *.sln
+
+# build
+/out
