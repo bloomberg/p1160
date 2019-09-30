@@ -7,17 +7,22 @@ the motivation, operation, and other aspects of this code can be found in the
 
 # Prerequisites
 
-At this time only the Microsoft Visual Studio 2017 toolchain and trunk gcc implements `std::pmr` as specified
-in the C++17 specification, so this example code requires that toolchain.
+ * CMake
+ * MSVC 2017 or gcc-9 
 
-While this code has only been tested with the *Professional* variant of Microsoft Visual Studio 2017,
-it should be compatible with all variants including the *Community* variant.
+At the time of writing the Microsoft Visual Studio 2017 and gcc-9 (trunk) are the only compilers that implement `std::pmr` as specified
+in the C++17 specification, so those are the only to toolchains that have been tested (it's likely to compatible with more recent
+versions of those compilers)
 
-To use gcc (at the time of writing, 2019.Apr.20), in the word of Jonathan Wakely: See https://gcc.gnu.org/wiki/InstallingGCC and replace gcc-4.6.0.tar.gz with a snapshot such as https://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/
+The most relevant instructions for installing gcc (at the time of writing, 2019.Apr.20): See https://gcc.gnu.org/wiki/InstallingGCC and replace gcc-4.6.0.tar.gz with a snapshot such as https://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/
 
-The latest code uses cmake to generate the build system, so you will need cmake.  Haven't yet tried with Visual Studio cmake support, I will update here when I do.
+libc++ (i.e. the native library for clang) does not yet have a standard `pmr` implementation.  I was able to compile the code in this repository using `<experimental/memory_resource>` that libc++ implements currently (May 2019).
 
-clang+libc++ does not yet have a standard `pmr` implementation.  I will attempt later to see if I can make the code work with `<experimental/memory_resource>` that libc++ implements currently (2019.Apr.30.)
+# Recorded Presentations
+
+## C++ Now 2019, Aspen, CO
+
+[![C++ Now 2019, Aspen, CO](https://img.youtube.com/vi/48oAZqlyx_g/maxresdefault.jpg)](https://youtu.be/48oAZqlyx_g)
 
 # How to Understand the Code
 
@@ -29,13 +34,19 @@ The repository consists of 5 major parts:
   * exception_testing -- an example using the `exception_test_loop`
   * patchpmr -- hacks to make clang with libc++ and older GNU libraries with experimental support work
 
-Please read the paper to follow the logic.
+Please read the paper, or watch the presentation, to better understand the repository contents.
+
+# Versions of this Repository
+
+Please use the `master` branch of this repository *unless* you are following a presentation from a conference (or C++ standardization meeting), in which case I suggest checking out the corresponding tag.
 
 # Versioning
 
 Git tag: R0 -- Corresponds to the paper revision P1160R0
 
 Git tag: CppNow2019 -- added gcc support, reorganized the code, switched to cmake
+
+Git tag: CppCon2019 -- fixed handling of 0 sized allocations to the standard way (allocating and not returning 0)
 
 # Troubleshooting
 
