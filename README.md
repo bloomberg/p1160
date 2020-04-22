@@ -3,7 +3,7 @@
 This repository contains the source code and build system for an example implementation of a `std::pmr`
 compatible polymorphic memory resource, intended for use in instrumented tests. The paper which describes
 the motivation, operation, and other aspects of this code can be found in the
-[WG21 paper repository](http://wg21.link/p1160r0 "P1160R0").
+[WG21 paper repository](http://wg21.link/p1160 "P1160R0").
 
 # Prerequisites
 
