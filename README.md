@@ -43,7 +43,7 @@ Please read the paper, or watch the presentation, to better understand the repos
 
 # Versions of this Repository
 
-Please use the `main` branch of this repository *unless* you are following a presentation from a conference, or for a specific paper revision, in which case I suggest checking out the corresponding tag.
+Please use the `master` branch of this repository *unless* you are following a presentation from a conference, or for a specific paper revision, in which case I suggest checking out the corresponding tag.
 
 # Versioning
 
