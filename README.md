@@ -25,8 +25,10 @@ libc++ (i.e. the native library for clang) does not yet have a standard `pmr` im
 
 # Recorded Presentations
 
+## CppCon 2019, Aurora, CO
+Watch this video first, it is shorter and more enjoyable.
+[![CppCon 2019, Aurora, CO](https://img.youtube.com/vi/vijveMT2OCY/maxresdefault.jpg)](https://youtu.be/vijveMT2OCY)
 ## C++ Now 2019, Aspen, CO
-
 [![C++ Now 2019, Aspen, CO](https://img.youtube.com/vi/48oAZqlyx_g/maxresdefault.jpg)](https://youtu.be/48oAZqlyx_g)
 
 # How to Understand the Code
