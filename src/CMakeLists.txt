@@ -19,8 +19,5 @@ add_definitions (
 
 endif()
 
-add_executable(exception_loop exception_testing.cpp)
+add_library(pmr_test_resource test_resource.cpp)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-target_link_libraries(exception_loop stdpmr supportlib)

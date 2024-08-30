@@ -82,7 +82,6 @@ endif()
 
 get_filename_component(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} ABSOLUTE)
 
-add_subdirectory(stdpmr)
-add_subdirectory(supportlib)
-add_subdirectory(pstring)
-add_subdirectory(exception_testing)
+add_subdirectory(src)
+add_subdirectory(include)
+add_subdirectory(examples)

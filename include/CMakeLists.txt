@@ -19,7 +19,5 @@ add_definitions (
 
 endif()
 
-add_library(stdpmr test_resource.cpp memory_resource_p1160)
-
-target_include_directories(stdpmr PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(include PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
