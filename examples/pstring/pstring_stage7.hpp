@@ -2,7 +2,7 @@
 #ifndef PSTRING_STAGE7_H_INCLUDED
 #define PSTRING_STAGE7_H_INCLUDED
 
-#include <memory_resource_p1160>
+#include <memory_resource>
 #include <cstddef>
 #include <cstring>
 #include <string>
@@ -11,7 +11,7 @@ class pstring {
     // This class is for demonstration purposes *only*.
 
 public:
-    using allocator_type = std::pmr::polymorphic_allocator_P0339R5<>;
+    using allocator_type = std::pmr::polymorphic_allocator<>;
 
     pstring(const char *cstr, allocator_type allocator = {});
 

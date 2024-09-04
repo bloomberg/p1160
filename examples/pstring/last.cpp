@@ -1,10 +1,10 @@
 // psrting_last.cpp                                                   -*-C++-*-
-#include <pstring_last.h>
+#include <pstring_last.hpp>
 
-#include <supportlib/framer.h>
+#include <supportlib/framer.hpp>
 
 #define SUPPORTLIB_ASSERT_REGISTER_ERROR ++errorCount;
-#include <supportlib/assert.h>
+#include <supportlib/assert.hpp>
 
 #include <test_resource.hpp>
 
@@ -40,7 +40,7 @@ void breathing_test(bool verbose)
 {
     Framer framer{ "breathing test", verbose };
 
-    std::pmr::test_resource tpmr{ "object", verbose };
+    beman::pmr::test_resource tpmr{ "object", verbose };
 
     pstring astring{ "barfool", &tpmr };
 
@@ -51,7 +51,7 @@ void copy_test(bool verbose)
 {
     Framer framer{ "copy constructor test", verbose };
 
-    std::pmr::test_resource tpmr{ "object", verbose };
+    beman::pmr::test_resource tpmr{ "object", verbose };
     tpmr.set_no_abort(true);
 
     pstring astring{ "barfool", &tpmr };
@@ -67,7 +67,7 @@ void assign_test(bool verbose)
 {
     Framer framer{ "copy assignment test", verbose };
 
-    std::pmr::test_resource tpmr{ "stage7", verbose };
+    beman::pmr::test_resource tpmr{ "stage7", verbose };
     tpmr.set_no_abort(true);
 
     pstring astring{ "barfool", &tpmr };
@@ -83,7 +83,7 @@ void self_assign_test(bool verbose)
 {
     Framer framer{ "self assignment test", verbose };
 
-    std::pmr::test_resource tpmr{ "stage7", verbose };
+    beman::pmr::test_resource tpmr{ "stage7", verbose };
     tpmr.set_no_abort(true);
 
     pstring astring{ "barfool", &tpmr };
@@ -97,13 +97,13 @@ void move_test(bool verbose)
 {
     Framer framer{ "move constructor", verbose };
 
-    std::pmr::test_resource           dr{ "default" };
-    std::pmr::test_resource_monitor  drm{ dr };
-    std::pmr::default_resource_guard drg{ &dr };
+    beman::pmr::test_resource           dr{ "default" };
+    beman::pmr::test_resource_monitor  drm{ dr };
+    beman::pmr::default_resource_guard drg{ &dr };
     dr.set_verbose(verbose);
 
-    std::pmr::test_resource          tr{ "object" };
-    std::pmr::test_resource_monitor trm{ tr };
+    beman::pmr::test_resource          tr{ "object" };
+    beman::pmr::test_resource_monitor trm{ tr };
     tr.set_verbose(verbose);
 
     pstring astring{ "barfool", &tr };

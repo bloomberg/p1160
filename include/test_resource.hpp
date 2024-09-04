@@ -1,6 +1,6 @@
 // memory_resource_p1160                                              -*-C++-*-
-#ifndef BEMANPROJECT_PMR_TEST_RESOURCE_P1160R3_INCLUDED
-#define BEMANPROJECT_PMR_TEST_RESOURCE_P1160R3_INCLUDED
+#ifndef BEMANPROJECT_PMR_TEST_RESOURCE_P1160R3_HPP_INCLUDED
+#define BEMANPROJECT_PMR_TEST_RESOURCE_P1160R3_HPP_INCLUDED
 
 #include <memory_resource>
 
@@ -17,47 +17,47 @@ namespace beman::pmr {
 
 struct test_resource_list;
 
-class test_resource : public memory_resource {
+class test_resource : public std::pmr::memory_resource {
 
-    string_view         m_name_{};
+    std::string_view           m_name_{};
+                              
+    std::atomic_int            m_no_abort_flag_{ false };
+    std::atomic_int            m_quiet_flag_{ false };
+    std::atomic_int            m_verbose_flag_{ false };
+    std::atomic_llong          m_allocation_limit_{ -1 };
+                              
+    std::atomic_llong          m_allocations_{ 0 };
+    std::atomic_llong          m_deallocations_{ 0 };
+    std::atomic_llong          m_mismatches_{ 0 };
+    std::atomic_llong          m_bounds_errors_{ 0 };
+    std::atomic_llong          m_bad_deallocate_params_{ 0 };
+                              
+    std::atomic_llong          m_blocks_in_use_{ 0 };
+    std::atomic_llong          m_max_blocks_{ 0 };
+    std::atomic_llong          m_total_blocks_{ 0 };
+                              
+    std::atomic_size_t         m_bytes_in_use_{ 0 };
+    std::atomic_llong          m_max_bytes_{ 0 };
+    std::atomic_size_t         m_total_bytes_{ 0 };
+                              
+    std::atomic_size_t         m_last_allocated_num_bytes_{ 0 };
+    std::atomic_size_t         m_last_allocated_alignment_{ 0 };
+    std::atomic<void *>        m_last_allocated_address_{ nullptr };
+                              
+    std::atomic_size_t         m_last_deallocated_num_bytes_{ 0 };
+    std::atomic_size_t         m_last_deallocated_alignment_{ 0 };
+    std::atomic<void *>        m_last_deallocated_address_{ nullptr };
+                              
+    test_resource_list        *m_list_{};
+                              
+    mutable std::mutex         m_lock_{};
 
-    atomic_int          m_no_abort_flag_{ false };
-    atomic_int          m_quiet_flag_{ false };
-    atomic_int          m_verbose_flag_{ false };
-    atomic_llong        m_allocation_limit_{ -1 };
-
-    atomic_llong        m_allocations_{ 0 };
-    atomic_llong        m_deallocations_{ 0 };
-    atomic_llong        m_mismatches_{ 0 };
-    atomic_llong        m_bounds_errors_{ 0 };
-    atomic_llong        m_bad_deallocate_params_{ 0 };
-
-    atomic_llong        m_blocks_in_use_{ 0 };
-    atomic_llong        m_max_blocks_{ 0 };
-    atomic_llong        m_total_blocks_{ 0 };
-
-    atomic_size_t       m_bytes_in_use_{ 0 };
-    atomic_llong        m_max_bytes_{ 0 };
-    atomic_size_t       m_total_bytes_{ 0 };
-
-    atomic_size_t       m_last_allocated_num_bytes_{ 0 };
-    atomic_size_t       m_last_allocated_alignment_{ 0 };
-    atomic<void *>      m_last_allocated_address_{ nullptr };
-
-    atomic_size_t       m_last_deallocated_num_bytes_{ 0 };
-    atomic_size_t       m_last_deallocated_alignment_{ 0 };
-    atomic<void *>      m_last_deallocated_address_{ nullptr };
-
-    test_resource_list *m_list_{};
-
-    mutable mutex       m_lock_{};
-
-    memory_resource    *m_pmr_{};
+    std::pmr::memory_resource *m_pmr_{};
 
 private:
-    [[nodiscard]] void *do_allocate(size_t bytes, size_t alignment) override;
+    [[nodiscard]] void *do_allocate(std::size_t bytes, std::size_t alignment) override;
 
-    void do_deallocate(void *p, size_t bytes, size_t alignment) override;
+    void do_deallocate(void *p, std::size_t bytes, std::size_t alignment) override;
 
     bool do_is_equal(const memory_resource& that) const noexcept override;
 
@@ -66,153 +66,158 @@ public:
     test_resource& operator=(const test_resource&) = delete;
 
     test_resource();
-    explicit test_resource(memory_resource *pmrp);
-    explicit test_resource(const char *name);
-    explicit test_resource(string_view name);
+    explicit test_resource(std::pmr::memory_resource *pmrp);
+    
+    explicit test_resource(const char       *name);
+    explicit test_resource(std::string_view  name);
+    
     explicit test_resource(bool verbose);
-    test_resource(string_view name, memory_resource *pmrp);
-    test_resource(const char *name, memory_resource *pmrp);
-    test_resource(bool verbose, memory_resource *pmrp);
-    test_resource(string_view name, bool verbose);
-    test_resource(const char *name, bool verbose);
-    test_resource(string_view name, bool verbose, memory_resource *pmrp);
-    test_resource(const char *name, bool verbose, memory_resource *pmrp);
+    
+    test_resource(std::string_view  name, std::pmr::memory_resource *pmrp);
+    test_resource(const char       *name, std::pmr::memory_resource *pmrp);
+    
+    test_resource(bool verbose, std::pmr::memory_resource *pmrp);
+    
+    test_resource(const char       *name, bool verbose);
+    test_resource(std::string_view  name, bool verbose);
+    test_resource(const char       *name, bool verbose, std::pmr::memory_resource *pmrp);
+    test_resource(std::string_view  name, bool verbose, std::pmr::memory_resource *pmrp);
 
     ~test_resource();
 
     void set_allocation_limit(long long limit) noexcept
     {
-        m_allocation_limit_.store(limit, memory_order_relaxed);
+        m_allocation_limit_.store(limit, std::memory_order_relaxed);
     }
 
     void set_no_abort(bool is_no_abort) noexcept
     {
-        m_no_abort_flag_.store(is_no_abort, memory_order_relaxed);
+        m_no_abort_flag_.store(is_no_abort, std::memory_order_relaxed);
     }
 
     void set_quiet(bool is_quiet) noexcept
     {
-        m_quiet_flag_.store(is_quiet, memory_order_relaxed);
+        m_quiet_flag_.store(is_quiet, std::memory_order_relaxed);
     }
 
     void set_verbose(bool is_verbose) noexcept
     {
-        m_verbose_flag_.store(is_verbose, memory_order_relaxed);
+        m_verbose_flag_.store(is_verbose, std::memory_order_relaxed);
     }
 
     long long allocation_limit() const noexcept
     {
-        return m_allocation_limit_.load(memory_order_relaxed);
+        return m_allocation_limit_.load(std::memory_order_relaxed);
     }
 
     bool is_no_abort() const noexcept
     {
-        return m_no_abort_flag_.load(memory_order_relaxed);
+        return m_no_abort_flag_.load(std::memory_order_relaxed);
     }
 
     bool is_quiet() const noexcept
     {
-        return m_quiet_flag_.load(memory_order_relaxed);
+        return m_quiet_flag_.load(std::memory_order_relaxed);
     }
 
     bool is_verbose() const noexcept
     {
-        return m_verbose_flag_.load(memory_order_relaxed);
+        return m_verbose_flag_.load(std::memory_order_relaxed);
     }
 
-    string_view name() const noexcept
+    std::string_view name() const noexcept
     {
         return m_name_;
     }
 
-    memory_resource *upstream_resource() const noexcept
+    std::pmr::memory_resource *upstream_resource() const noexcept
     {
         return m_pmr_;
     }
 
     void *last_allocated_address() const noexcept
     {
-        return m_last_allocated_address_.load(memory_order_relaxed);
+        return m_last_allocated_address_.load(std::memory_order_relaxed);
     }
 
-    size_t last_allocated_num_bytes() const noexcept
+    std::size_t last_allocated_num_bytes() const noexcept
     {
-        return m_last_allocated_num_bytes_.load(memory_order_relaxed);
+        return m_last_allocated_num_bytes_.load(std::memory_order_relaxed);
     }
 
-    size_t last_allocated_aligment() const noexcept
+    std::size_t last_allocated_aligment() const noexcept
     {
-        return m_last_allocated_alignment_.load(memory_order_relaxed);
+        return m_last_allocated_alignment_.load(std::memory_order_relaxed);
     }
 
     void *last_deallocated_address() const noexcept
     {
-        return m_last_deallocated_address_.load(memory_order_relaxed);
+        return m_last_deallocated_address_.load(std::memory_order_relaxed);
     }
 
-    size_t last_deallocated_num_bytes() const noexcept
+    std::size_t last_deallocated_num_bytes() const noexcept
     {
-        return m_last_deallocated_num_bytes_.load(memory_order_relaxed);
+        return m_last_deallocated_num_bytes_.load(std::memory_order_relaxed);
     }
 
-    size_t last_deallocated_aligment() const noexcept
+    std::size_t last_deallocated_aligment() const noexcept
     {
-        return m_last_deallocated_alignment_.load(memory_order_relaxed);
+        return m_last_deallocated_alignment_.load(std::memory_order_relaxed);
     }
 
     long long allocations() const noexcept
     {
-        return m_allocations_.load(memory_order_relaxed);
+        return m_allocations_.load(std::memory_order_relaxed);
     }
 
     long long deallocations() const noexcept
     {
-        return m_deallocations_.load(memory_order_relaxed);
+        return m_deallocations_.load(std::memory_order_relaxed);
     }
 
     long long blocks_in_use() const noexcept
     {
-        return m_blocks_in_use_.load(memory_order_relaxed);
+        return m_blocks_in_use_.load(std::memory_order_relaxed);
     }
 
     long long max_blocks() const noexcept
     {
-        return m_max_blocks_.load(memory_order_relaxed);
+        return m_max_blocks_.load(std::memory_order_relaxed);
     }
 
     long long total_blocks() const noexcept
     {
-        return m_total_blocks_.load(memory_order_relaxed);
+        return m_total_blocks_.load(std::memory_order_relaxed);
     }
 
     long long bounds_errors() const noexcept
     {
-        return m_bounds_errors_.load(memory_order_relaxed);
+        return m_bounds_errors_.load(std::memory_order_relaxed);
     }
 
     long long bad_deallocate_params() const noexcept
     {
-        return m_bad_deallocate_params_.load(memory_order_relaxed);
+        return m_bad_deallocate_params_.load(std::memory_order_relaxed);
     }
 
     long long bytes_in_use() const noexcept
     {
-        return m_bytes_in_use_.load(memory_order_relaxed);
+        return m_bytes_in_use_.load(std::memory_order_relaxed);
     }
 
     long long max_bytes() const noexcept
     {
-        return m_max_bytes_.load(memory_order_relaxed);
+        return m_max_bytes_.load(std::memory_order_relaxed);
     }
 
     long long total_bytes() const noexcept
     {
-        return m_total_bytes_.load(memory_order_relaxed);
+        return m_total_bytes_.load(std::memory_order_relaxed);
     }
 
     long long mismatches() const noexcept
     {
-        return m_mismatches_.load(memory_order_relaxed);
+        return m_mismatches_.load(std::memory_order_relaxed);
     }
 
     void print() const noexcept;
@@ -232,16 +237,16 @@ public:
 };
 
 
-class test_resource_exception : public ::std::bad_alloc {
+class test_resource_exception : public std::bad_alloc {
 
     test_resource *m_originating_;
-    size_t         m_size_;
-    size_t         m_alignment_;
+    std::size_t    m_size_;
+    std::size_t    m_alignment_;
 
   public:
     test_resource_exception(test_resource *originating,
-                            size_t         size,
-                            size_t         alignment) noexcept
+                            std::size_t    size,
+                            std::size_t    alignment) noexcept
     : m_originating_(originating)
     , m_size_(size)
     , m_alignment_(alignment)
@@ -258,12 +263,12 @@ class test_resource_exception : public ::std::bad_alloc {
         return m_originating_;
     }
 
-    size_t size() const noexcept
+    std::size_t size() const noexcept
     {
         return m_size_;
     }
 
-    size_t alignment() const noexcept
+    std::size_t alignment() const noexcept
     {
         return m_alignment_;
     }
@@ -356,21 +361,21 @@ void exception_test_loop(test_resource& pmrp, CODE_BLOCK codeBlock)
             return;
         } catch (const test_resource_exception& e) {
             if (e.originating_resource() != &pmrp) {
-                printf("\t*** test_resource_exception"
-                       " from unexpected test resource: %p %.*s ***\n",
-                       e.originating_resource(),
-                       static_cast<int>(
-                                    e.originating_resource()->name().length()),
-                       e.originating_resource()->name().data());
+                std::printf("\t*** test_resource_exception"
+                            " from unexpected test resource: %p %.*s ***\n",
+                            e.originating_resource(),
+                            static_cast<int>(
+                                         e.originating_resource()->name().length()),
+                            e.originating_resource()->name().data());
                 throw;
             }
             else if (pmrp.is_verbose()) {
-                printf("\t*** test_resource_exception: "
-                       "alloc limit = %lld, last alloc size = %zu, "
-                       "align = %zu ***\n",
-                       exceptionCounter,
-                       e.size(),
-                       e.alignment());
+                std::printf("\t*** test_resource_exception: "
+                            "alloc limit = %lld, last alloc size = %zu, "
+                            "align = %zu ***\n",
+                            exceptionCounter,
+                            e.size(),
+                            e.alignment());
             }
         }
     }
@@ -378,13 +383,13 @@ void exception_test_loop(test_resource& pmrp, CODE_BLOCK codeBlock)
 
 
 class [[maybe_unused]] default_resource_guard {
-    memory_resource * m_old_resource;
+    std::pmr::memory_resource * m_old_resource;
 
   public:
     explicit default_resource_guard(std::pmr::memory_resource * newDefault)
     {
         assert(newDefault != nullptr);
-        m_old_resource = set_default_resource(newDefault);
+        m_old_resource = std::pmr::set_default_resource(newDefault);
     }
 
     default_resource_guard(const default_resource_guard&) = delete;
@@ -393,19 +398,20 @@ class [[maybe_unused]] default_resource_guard {
 
     ~default_resource_guard()
     {
-        set_default_resource(m_old_resource);
+        std::pmr::set_default_resource(m_old_resource);
     }
 };
 
+/*
 template<class ValueType = byte>
-class polymorphic_allocator_P0339R5 : public polymorphic_allocator<ValueType> {
+class polymorphic_allocator_P0339R5 : public std::polymorphic_allocator<ValueType> {
     // See Pablo Halpern, Dietmar Kuehl (2018). P0339R5 polymorphic_allocator<>
     // as a vocabulary type
     // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0339r5.pdf
 
-    memory_resource *_Resource()
+    std::pmr::memory_resource *_Resource()
     {
-        return *reinterpret_cast<memory_resource **>(this);
+        return *reinterpret_cast<std::pmr::memory_resource **>(this);
     }
 
 public:
@@ -414,34 +420,34 @@ public:
 
     using value_type = ValueType;
 
-    using polymorphic_allocator<ValueType>::polymorphic_allocator;
+    using std::polymorphic_allocator<ValueType>::polymorphic_allocator;
 
     polymorphic_allocator_P0339R5&
         operator=(const polymorphic_allocator_P0339R5&) = delete;
 
     [[nodiscard]]
-    void *allocate_bytes(const size_t bytes,
-                         const size_t alignment = alignof(max_align_t))
+    void *allocate_bytes(const std::size_t bytes,
+                         const std::size_t alignment = alignof(max_align_t))
     {
         return (_Resource()->allocate(bytes, alignment));
     }
 
-    void deallocate_bytes(void *const  ptr,
-                          const size_t bytes,
-                          const size_t alignment = alignof(max_align_t))
+    void deallocate_bytes(void * const      ptr,
+                          const std::size_t bytes,
+                          const std::size_t alignment = alignof(max_align_t))
     {
         return (_Resource()->deallocate(ptr, bytes, alignment));
     }
 
     template <class ObjectType>
-    [[nodiscard]] ObjectType *allocate_object(const size_t count = 1)
+    [[nodiscard]] ObjectType *allocate_object(const std::size_t count = 1)
     {
         return  static_cast<ObjectType *>(
               allocate_bytes(count * sizeof(ObjectType), alignof(ObjectType)));
     }
 
     template <class ObjectType>
-    void deallocate_object(ObjectType *ptr, const size_t count = 1)
+    void deallocate_object(ObjectType *ptr, const std::size_t count = 1)
     {
         deallocate_bytes(ptr, count * sizeof(ObjectType), alignof(ObjectType));
     }
@@ -470,7 +476,7 @@ public:
         deallocate_object(ptr);
     }
 };
-
+*/
 } // close namespace
 
 #endif

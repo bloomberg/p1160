@@ -1,7 +1,7 @@
-#include <supportlib/framer.h>
-#include <supportlib/assert.h>
+#include <supportlib/framer.hpp>
+#include <supportlib/assert.hpp>
 
-#include <pstring_stage8.h>
+#include <pstring_stage8.hpp>
 
 #include <test_resource.hpp>
 
@@ -11,13 +11,13 @@ void test(bool verbose)
 {
     Framer framer{ "Monitoring", verbose };
 
-    std::pmr::test_resource           dr{ "default" };
-    std::pmr::test_resource_monitor  drm{ dr };
-    std::pmr::default_resource_guard drg{ &dr };
+    beman::pmr::test_resource           dr{ "default" };
+    beman::pmr::test_resource_monitor  drm{ dr };
+    beman::pmr::default_resource_guard drg{ &dr };
     dr.set_verbose(verbose);
 
-    std::pmr::test_resource          tr{ "object" };
-    std::pmr::test_resource_monitor trm{ tr };
+    beman::pmr::test_resource          tr{ "object" };
+    beman::pmr::test_resource_monitor trm{ tr };
     tr.set_verbose(verbose);
 
     pstring astring{ "barfool", &tr };

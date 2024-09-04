@@ -1,8 +1,8 @@
 // pstring_last.h                                                     -*-C++-*-
-#ifndef PSTRING_LAST_H_INCLUDED
-#define PSTRING_LAST_H_INCLUDED
+#ifndef PSTRING_LAST_HPP_INCLUDED
+#define PSTRING_LAST_HPP_INCLUDED
 
-#include <pstring_stage9.h>
+#include <pstring_stage9.hpp>
 
 #endif
 

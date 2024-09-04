@@ -1,7 +1,7 @@
-#include <pstring_stage2.h>
+#include <pstring_stage2.hpp>
 
-#include <supportlib/framer.h>
-#include <supportlib/assert.h>
+#include <supportlib/framer.hpp>
+#include <supportlib/assert.hpp>
 
 #include <test_resource.hpp>
 
@@ -9,7 +9,7 @@ void test(bool verbose)
 {
     Framer framer{ "Stage2", verbose };
 
-    std::pmr::test_resource tpmr{ "stage2", verbose };
+    beman::pmr::test_resource tpmr{ "stage2", verbose };
     tpmr.set_no_abort(true);
 
     pstring astring{ "barfool", &tpmr };

@@ -1,5 +1,5 @@
-#include <supportlib/framer.h>
-#include <supportlib/assert.h>
+#include <supportlib/framer.hpp>
+#include <supportlib/assert.hpp>
 
 #include <test_resource.hpp>
 
@@ -10,10 +10,10 @@ void test(bool verbose)
 {
     Framer framer{ "Exception Testing", verbose };
 
-    std::pmr::test_resource tpmr{ "tester", verbose };
+    beman::pmr::test_resource tpmr{ "tester", verbose };
     const char *longstr = "A very very long string that allocates memory";
 
-    std::pmr::exception_test_loop(tpmr,
+    beman::pmr::exception_test_loop(tpmr,
                                   [longstr](std::pmr::memory_resource& pmrp) {
         std::pmr::deque<std::pmr::string> deq{ &pmrp };
         deq.emplace_back(longstr);
