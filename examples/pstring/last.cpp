@@ -6,7 +6,7 @@
 #define SUPPORTLIB_ASSERT_REGISTER_ERROR ++errorCount;
 #include <supportlib/assert.h>
 
-#include <memory_resource_p1160>
+#include <test_resource.hpp>
 
 #include <utility>
 

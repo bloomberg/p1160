@@ -1,5 +1,5 @@
 // test_resource.cpp                                                  -*-C++-*-
-#include <memory_resource_p1160>
+#include <test_resource.hpp>
 
 #include <algorithm>  // for min
 #include <cassert>    // for assert

@@ -3,7 +3,7 @@
 #include <supportlib/framer.h>
 #include <supportlib/assert.h>
 
-#include <memory_resource_p1160>
+#include <test_resource.hpp>
 
 void test(bool verbose)
 {

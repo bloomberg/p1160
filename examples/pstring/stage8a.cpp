@@ -3,7 +3,7 @@
 
 #include <pstring_stage8.h>
 
-#include <memory_resource_p1160>
+#include <test_resource.hpp>
 
 #include <utility>
 
