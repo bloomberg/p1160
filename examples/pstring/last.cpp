@@ -6,7 +6,7 @@
 #define SUPPORTLIB_ASSERT_REGISTER_ERROR ++errorCount;
 #include <supportlib/assert.hpp>
 
-#include <test_resource.hpp>
+#include <pmr/test_resource.hpp>
 
 #include <utility>
 

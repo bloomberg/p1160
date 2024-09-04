@@ -1,7 +1,7 @@
 #include <supportlib/framer.hpp>
 #include <supportlib/assert.hpp>
 
-#include <test_resource.hpp>
+#include <pmr/test_resource.hpp>
 
 #include <deque>
 #include <string>

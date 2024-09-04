@@ -1,5 +1,5 @@
 // test_resource.cpp                                                  -*-C++-*-
-#include <test_resource.hpp>
+#include <pmr/test_resource.hpp>
 
 #include <algorithm>  // for min
 #include <cassert>    // for assert

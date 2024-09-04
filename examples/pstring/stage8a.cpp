@@ -3,7 +3,7 @@
 
 #include <pstring_stage8.hpp>
 
-#include <test_resource.hpp>
+#include <pmr/test_resource.hpp>
 
 #include <utility>
 
