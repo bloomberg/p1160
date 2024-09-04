@@ -2,7 +2,7 @@
 #ifndef PSTRING_STAGE7_H_INCLUDED
 #define PSTRING_STAGE7_H_INCLUDED
 
-#include <memory_resource_p1160>
+#include <memory_resource>
 #include <cstddef>
 #include <cstring>
 #include <string>

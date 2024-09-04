@@ -1,7 +1,7 @@
-#include <supportlib/framer.h>
-#include <supportlib/assert.h>
+#include <supportlib/framer.hpp>
+#include <supportlib/assert.hpp>
 
-#include <pstring_stage9.h>
+#include <pstring_stage9.hpp>
 
 #include <test_resource.hpp>
 

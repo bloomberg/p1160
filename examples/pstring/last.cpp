@@ -1,10 +1,10 @@
 // psrting_last.cpp                                                   -*-C++-*-
-#include <pstring_last.h>
+#include <pstring_last.hpp>
 
-#include <supportlib/framer.h>
+#include <supportlib/framer.hpp>
 
 #define SUPPORTLIB_ASSERT_REGISTER_ERROR ++errorCount;
-#include <supportlib/assert.h>
+#include <supportlib/assert.hpp>
 
 #include <test_resource.hpp>
 
