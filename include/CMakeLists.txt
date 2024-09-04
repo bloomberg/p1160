@@ -19,5 +19,5 @@ add_definitions (
 
 endif()
 
-target_include_directories(include PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(pmr_test_resource PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
