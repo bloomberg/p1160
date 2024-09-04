@@ -22,3 +22,8 @@ endif()
 
 add_library(pmr_test_resource test_resource.cpp)
 
+target_include_directories(
+  pmr_test_resource
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+)
