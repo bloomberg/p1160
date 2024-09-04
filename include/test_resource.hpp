@@ -55,9 +55,12 @@ class test_resource : public std::pmr::memory_resource {
     std::pmr::memory_resource *m_pmr_{};
 
 private:
-    [[nodiscard]] void *do_allocate(std::size_t bytes, std::size_t alignment) override;
+    [[nodiscard]] void *do_allocate(std::size_t bytes,
+                                    std::size_t alignment) override;
 
-    void do_deallocate(void *p, std::size_t bytes, std::size_t alignment) override;
+    void do_deallocate(void        *p,
+                       std::size_t  bytes,
+                       std::size_t  alignment) override;
 
     bool do_is_equal(const memory_resource& that) const noexcept override;
 
@@ -68,8 +71,8 @@ public:
     test_resource();
     explicit test_resource(std::pmr::memory_resource *pmrp);
     
-    explicit test_resource(const char       *name);
     explicit test_resource(std::string_view  name);
+    explicit test_resource(const char       *name);
     
     explicit test_resource(bool verbose);
     
@@ -80,8 +83,12 @@ public:
     
     test_resource(const char       *name, bool verbose);
     test_resource(std::string_view  name, bool verbose);
-    test_resource(const char       *name, bool verbose, std::pmr::memory_resource *pmrp);
-    test_resource(std::string_view  name, bool verbose, std::pmr::memory_resource *pmrp);
+    test_resource(std::string_view           name,
+                  bool                       verbose,
+                  std::pmr::memory_resource *pmrp);
+    test_resource(const char                *name,
+                  bool                       verbose,
+                  std::pmr::memory_resource *pmrp);
 
     ~test_resource();
 

@@ -136,32 +136,33 @@ void formatInvalidMemoryBlock(AlignedHeader *address,
     }
     else {
         if (numBytes <= 0) {
-            std::printf("*** Invalid (non-positive) byte count %zu at address %p. "
-                        "*** \n",
+            std::printf("*** Invalid (non-positive) byte count %zu at address "
+                        "%p. *** \n",
                         numBytes,
                         static_cast<void *>(payload));
         }
         if (deallocatedBytes != address->m_object_.m_bytes_) {
-            std::printf("*** Freeing segment at %p using wrong size (%zu vs. %zu). "
-                        "***\n",
+            std::printf("*** Freeing segment at %p using wrong size (%zu vs. "
+                        "%zu). ***\n",
                         static_cast<void *>(payload),
                         deallocatedBytes,
                         numBytes);
         }
         if (deallocatedAlignment != address->m_object_.m_alignment_) {
-            std::printf("*** Freeing segment at %p using wrong alignment (%zu vs. "
-                        "%zu). ***\n",
+            std::printf("*** Freeing segment at %p using wrong alignment (%zu "
+                        "vs. %zu). ***\n",
                         static_cast<void *>(payload),
                         deallocatedAlignment,
                         alignment);
         }
         if (allocator != address->m_object_.m_pmr_) {
-            std::printf("*** Freeing segment at %p from wrong allocator. ***\n",
+            std::printf("*** Freeing segment at %p from wrong allocator. "
+                        "***\n",
                         static_cast<void *>(payload));
         }
         if (underrunBy) {
-            std::printf("*** Memory corrupted at %d bytes before %zu byte segment "
-                        "at %p. ***\n",
+            std::printf("*** Memory corrupted at %d bytes before %zu byte "
+                        "segment at %p. ***\n",
                         underrunBy,
                         numBytes,
                         static_cast<void *>(payload));
@@ -170,8 +171,8 @@ void formatInvalidMemoryBlock(AlignedHeader *address,
             formatBlock(payload - paddingSize, paddingSize);
         }
         if (overrunBy) {
-            std::printf("*** Memory corrupted at %d bytes after %zu byte segment "
-                        "at %p. ***\n",
+            std::printf("*** Memory corrupted at %d bytes after %zu byte "
+                        "segment at %p. ***\n",
                         overrunBy,
                         numBytes,
                         static_cast<void *>(payload));
@@ -198,8 +199,10 @@ void formatBadBytesForNullptr(std::size_t deallocatedBytes,
 {
     assert(deallocatedBytes != 0);
 
-    std::printf("*** Freeing a nullptr using non-zero size (%zu) with alignment "
-                "(%zu). ***\n", deallocatedBytes, deallocatedAlignment);
+    std::printf("*** Freeing a nullptr using non-zero size (%zu) with "
+                "alignment (%zu). ***\n",
+                deallocatedBytes,
+                deallocatedAlignment);
 }
 
 struct test_resource_list {
@@ -350,7 +353,8 @@ test_resource::test_resource(bool verbose)
 {
 }
 
-test_resource::test_resource(std::string_view name, std::pmr::memory_resource *pmrp)
+test_resource::test_resource(std::string_view           name,
+                             std::pmr::memory_resource *pmrp)
 : test_resource(name, false, pmrp)
 {
 }
@@ -418,7 +422,8 @@ test_resource::~test_resource()
             std::printf("MEMORY_LEAK");
             if (!m_name_.empty()) {
                 std::printf(" from %.*s",
-                            static_cast<int>(m_name_.length()), m_name_.data());
+                            static_cast<int>(m_name_.length()),
+                            m_name_.data());
             }
             std::printf(":\n  Number of blocks in use = %lld\n"
                         "   Number of bytes in use = %lld\n",
@@ -435,8 +440,8 @@ void *test_resource::do_allocate(std::size_t bytes, std::size_t alignment)
 {
     std::lock_guard guard{ m_lock_ };
 
-    long long allocationIndex = m_allocations_.fetch_add(1,
-                                                         std::memory_order_relaxed);
+    long long allocationIndex = 
+                        m_allocations_.fetch_add(1, std::memory_order_relaxed);
 
     if (alignment > alignof(std::max_align_t)) {
         // Over-aligned allocations are not currently supported.
@@ -444,7 +449,8 @@ void *test_resource::do_allocate(std::size_t bytes, std::size_t alignment)
     }
 
     if (0 <= allocation_limit()) {
-        if (0 > m_allocation_limit_.fetch_add(-1, std::memory_order_relaxed) - 1) {
+        if (0 > m_allocation_limit_.fetch_add(-1,
+                                              std::memory_order_relaxed) - 1) {
             throw test_resource_exception(this, bytes, alignment);
         }
     }
@@ -524,7 +530,9 @@ void *test_resource::do_allocate(std::size_t bytes, std::size_t alignment)
     return address;
 }
 
-void test_resource::do_deallocate(void *p, std::size_t bytes, std::size_t alignment)
+void test_resource::do_deallocate(void        *p,
+                                  std::size_t  bytes,
+                                  std::size_t  alignment)
 {
     std::lock_guard guard{ m_lock_ };
 
@@ -701,7 +709,8 @@ void test_resource::do_deallocate(void *p, std::size_t bytes, std::size_t alignm
     m_pmr_->deallocate(head, sizeof(AlignedHeader) + size + paddingSize);
 }
 
-bool test_resource::do_is_equal(const std::pmr::memory_resource& that) const noexcept
+bool test_resource::do_is_equal(const std::pmr::memory_resource& that)
+                                                                 const noexcept
 {
     return this == &that;
 }
