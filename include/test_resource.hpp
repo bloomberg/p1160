@@ -1,6 +1,6 @@
 // memory_resource_p1160                                              -*-C++-*-
-#ifndef BLOOMBERGLP_STD_TEST_RESOURCE_P1160_INCLUDED
-#define BLOOMBERGLP_STD_TEST_RESOURCE_P1160_INCLUDED
+#ifndef BEMANPROJECT_PMR_TEST_RESOURCE_P1160R3_INCLUDED
+#define BEMANPROJECT_PMR_TEST_RESOURCE_P1160R3_INCLUDED
 
 #include <memory_resource>
 
@@ -13,7 +13,7 @@
 #include <cstdio>
 #include <cassert>
 
-namespace std::pmr {
+namespace beman::pmr {
 
 struct test_resource_list;
 
@@ -250,7 +250,7 @@ class test_resource_exception : public ::std::bad_alloc {
 
     const char *what() const noexcept override
     {
-        return "std::pmr::test_resource_exception";
+        return "beman::pmr::test_resource_exception";
     }
 
     test_resource *originating_resource() const noexcept

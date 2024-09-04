@@ -8,7 +8,7 @@
 #include <cstdlib>    // abort
 #include <cstring>    // memset
 
-namespace std::pmr {
+namespace beman::pmr {
 
 namespace {
 
