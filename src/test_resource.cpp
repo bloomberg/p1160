@@ -32,41 +32,41 @@ struct Link {
     // This 'struct' holds pointers to the next and preceding allocated
     // memory block in the allocated memory block list.
 
-    long long  m_index_;  // index of this allocation
-    Link      *m_next_;   // next 'Link' pointer
-    Link      *m_prev_;   // previous 'Link' pointer
+    long long  m_index;  // index of this allocation
+    Link      *m_next;   // next 'Link' pointer
+    Link      *m_prev;   // previous 'Link' pointer
 };
 
 struct alignas(std::max_align_t) Padding {
     // This struct just make 'Header' readable.
 
-    std::byte m_padding_[paddingSize];
+    std::byte m_padding[paddingSize];
 };
 
 struct Header {
     // This 'struct' defines the data preceding the user segment.
 
-    unsigned int  m_magic_number_;  // allocated/deallocated/other identifier
+    unsigned int  m_magic_number;  // allocated/deallocated/other identifier
 
-    std::size_t   m_bytes_;         // number of available bytes in this block
+    std::size_t   m_bytes;         // number of available bytes in this block
 
-    std::size_t   m_alignment_;     // the allocation alignment
+    std::size_t   m_alignment;     // the allocation alignment
 
-    long long     m_index_;         // index of this memory allocation
+    long long     m_index;         // index of this memory allocation
 
-    Link         *m_address_;       // address of block in linked list
+    Link         *m_address;       // address of block in linked list
 
-    void         *m_pmr_;           // address of current PMR
+    void         *m_pmr;           // address of current PMR
 
-    Padding       m_padding_;       // padding -- guaranteed to extend to the
-                                    // end of the struct
+    Padding       m_padding;       // padding -- guaranteed to extend to the
+                                   // end of the struct
 };
 
 union AlignedHeader {
     // Maximally-aligned raw buffer big enough for a Header.
 
-    Header           m_object_;
-    std::max_align_t m_alignment_;
+    Header           m_object;
+    std::max_align_t m_alignment;
 };
 
 }  // close unnamed namespace
@@ -117,9 +117,9 @@ void formatInvalidMemoryBlock(AlignedHeader *address,
     // portion of the allocated memory is printed (regardless of the amount of
     // memory that was requested).
 {
-    unsigned int  magicNumber = address->m_object_.m_magic_number_;
-    std::size_t   numBytes    = address->m_object_.m_bytes_;
-    std::size_t   alignment   = address->m_object_.m_alignment_;
+    unsigned int  magicNumber = address->m_object.m_magic_number;
+    std::size_t   numBytes    = address->m_object.m_bytes;
+    std::size_t   alignment   = address->m_object.m_alignment;
     std::byte    *payload     = reinterpret_cast<std::byte *>(address + 1);
 
     if (allocatedMemoryPattern != magicNumber) {
@@ -141,21 +141,21 @@ void formatInvalidMemoryBlock(AlignedHeader *address,
                         numBytes,
                         static_cast<void *>(payload));
         }
-        if (deallocatedBytes != address->m_object_.m_bytes_) {
+        if (deallocatedBytes != address->m_object.m_bytes) {
             std::printf("*** Freeing segment at %p using wrong size (%zu vs. "
                         "%zu). ***\n",
                         static_cast<void *>(payload),
                         deallocatedBytes,
                         numBytes);
         }
-        if (deallocatedAlignment != address->m_object_.m_alignment_) {
+        if (deallocatedAlignment != address->m_object.m_alignment) {
             std::printf("*** Freeing segment at %p using wrong alignment (%zu "
                         "vs. %zu). ***\n",
                         static_cast<void *>(payload),
                         deallocatedAlignment,
                         alignment);
         }
-        if (allocator != address->m_object_.m_pmr_) {
+        if (allocator != address->m_object.m_pmr) {
             std::printf("*** Freeing segment at %p from wrong allocator. "
                         "***\n",
                         static_cast<void *>(payload));
@@ -209,8 +209,8 @@ struct test_resource_list {
     // This 'struct' stores a head 'Link' and a tail 'Link' for list
     // manipulation.
 
-    Link *d_head_p;  // address of first link in list (or 'nullptr')
-    Link *d_tail_p;  // address of last link in list (or 'nullptr')
+    Link *m_head_p;  // address of first link in list (or 'nullptr')
+    Link *m_tail_p;  // address of last link in list (or 'nullptr')
 };
 
 static
@@ -223,18 +223,18 @@ Link *removeLink(test_resource_list *list, Link *link)
     // the link removed is the head itself.
 {
 
-    if (link == list->d_tail_p) {
-        list->d_tail_p  = link->m_prev_;
+    if (link == list->m_tail_p) {
+        list->m_tail_p  = link->m_prev;
     }
     else {
-        link->m_next_->m_prev_ = link->m_prev_;
+        link->m_next->m_prev = link->m_prev;
     }
 
-    if (link == list->d_head_p) {
-        list->d_head_p  = link->m_next_;
+    if (link == list->m_head_p) {
+        list->m_head_p  = link->m_next;
     }
     else {
-        link->m_prev_->m_next_ = link->m_next_;
+        link->m_prev->m_next = link->m_next;
     }
 
     return link;
@@ -254,18 +254,18 @@ Link *addLink(test_resource_list        *list,
 
     assert(nullptr != link);  // Ensure 'allocate' returned memory.
 
-    link->m_next_ = nullptr;
-    link->m_index_  = index;
+    link->m_next = nullptr;
+    link->m_index  = index;
 
-    if (!list->d_head_p) {
-        list->d_head_p = link;
-        list->d_tail_p = link;
-        link->m_prev_ = nullptr;
+    if (!list->m_head_p) {
+        list->m_head_p = link;
+        list->m_tail_p = link;
+        link->m_prev   = nullptr;
     }
     else {
-        list->d_tail_p->m_next_ = link;
-        link->m_prev_ = list->d_tail_p;
-        list->d_tail_p = link;
+        list->m_tail_p->m_next = link;
+        link->m_prev           = list->m_tail_p;
+        list->m_tail_p         = link;
     }
 
     return link;
@@ -276,12 +276,12 @@ void printList(const test_resource_list& list)
     // Print the indices of all 'Link' objects currently in the specified
     // 'allocatedList'.
 {
-    const Link *pLink = list.d_head_p;
+    const Link *pLink = list.m_head_p;
 
     while (pLink) {
         for (int i = 0; i < 8 && pLink; ++i) {
-            printf("%lld\t", pLink->m_index_);
-            pLink = pLink->m_next_;
+            printf("%lld\t", pLink->m_index);
+            pLink = pLink->m_next;
         }
 
         // The space after the '\n' is needed to align these indices properly
@@ -310,9 +310,9 @@ std::pmr::memory_resource* local_malloc_free_resource()
             return rv;
         }
 
-        void do_deallocate(void                    *p,
+        void do_deallocate(void                         *p,
                            [[maybe_unused]] std::size_t  bytes,
-                           [[maybe_unused]] std::size_t alignment) override
+                           [[maybe_unused]] std::size_t  alignment) override
         {
             std::free(p);
         }
@@ -382,14 +382,13 @@ test_resource::test_resource(const char *name, bool verbose)
 test_resource::test_resource(std::string_view           name,
                              bool                       verbose,
                              std::pmr::memory_resource *pmrp)
-: m_name_(name)
-, m_verbose_flag_(verbose)
-, m_pmr_(pmrp)
+: m_name(name)
+, m_verbose_flag(verbose)
+, m_pmr(pmrp)
 {
-    m_list_ = (test_resource_list *)m_pmr_->allocate(
-                                                   sizeof(test_resource_list));
-    m_list_->d_head_p = nullptr;
-    m_list_->d_tail_p = nullptr;
+    m_list = (test_resource_list *)m_pmr->allocate(sizeof(test_resource_list));
+    m_list->m_head_p = nullptr;
+    m_list->m_tail_p = nullptr;
 }
 
 test_resource::test_resource(const char                *name,
@@ -405,25 +404,25 @@ test_resource::~test_resource()
         print();
     }
 
-    Link *link_p = m_list_->d_head_p;
+    Link *link_p = m_list->m_head_p;
     while (link_p) {
         Link *linkToFree = link_p;
-        link_p = link_p->m_next_;
-        m_pmr_->deallocate(linkToFree, sizeof(Link), alignof(Link));
+        link_p = link_p->m_next;
+        m_pmr->deallocate(linkToFree, sizeof(Link), alignof(Link));
     }
-    m_list_->d_head_p = nullptr;
-    m_list_->d_tail_p = nullptr;
-    m_pmr_->deallocate(m_list_,
-                       sizeof(test_resource_list),
-                       alignof(test_resource_list));
+    m_list->m_head_p = nullptr;
+    m_list->m_tail_p = nullptr;
+    m_pmr->deallocate(m_list,
+                      sizeof(test_resource_list),
+                      alignof(test_resource_list));
 
     if (!is_quiet()) {
         if (bytes_in_use() || blocks_in_use()) {
             std::printf("MEMORY_LEAK");
-            if (!m_name_.empty()) {
+            if (!m_name.empty()) {
                 std::printf(" from %.*s",
-                            static_cast<int>(m_name_.length()),
-                            m_name_.data());
+                            static_cast<int>(m_name.length()),
+                            m_name.data());
             }
             std::printf(":\n  Number of blocks in use = %lld\n"
                         "   Number of bytes in use = %lld\n",
@@ -438,10 +437,10 @@ test_resource::~test_resource()
 
 void *test_resource::do_allocate(std::size_t bytes, std::size_t alignment)
 {
-    std::lock_guard guard{ m_lock_ };
+    std::lock_guard guard{ m_lock };
 
     long long allocationIndex = 
-                        m_allocations_.fetch_add(1, std::memory_order_relaxed);
+                         m_allocations.fetch_add(1, std::memory_order_relaxed);
 
     if (alignment > alignof(std::max_align_t)) {
         // Over-aligned allocations are not currently supported.
@@ -449,13 +448,13 @@ void *test_resource::do_allocate(std::size_t bytes, std::size_t alignment)
     }
 
     if (0 <= allocation_limit()) {
-        if (0 > m_allocation_limit_.fetch_add(-1,
-                                              std::memory_order_relaxed) - 1) {
+        if (0 > m_allocation_limit.fetch_add(-1,
+                                             std::memory_order_relaxed) - 1) {
             throw test_resource_exception(this, bytes, alignment);
         }
     }
 
-    AlignedHeader *head = (AlignedHeader *)m_pmr_->allocate(
+    AlignedHeader *head = (AlignedHeader *)m_pmr->allocate(
                                   sizeof(AlignedHeader) + bytes + paddingSize);
     if (!head) {
         // We cannot satisfy this request.  Throw 'std::bad_alloc'.
@@ -463,10 +462,10 @@ void *test_resource::do_allocate(std::size_t bytes, std::size_t alignment)
         throw std::bad_alloc();
     }
 
-    m_last_allocated_num_bytes_.store(static_cast<long long>(bytes),
-                                      std::memory_order_relaxed);
-    m_last_allocated_alignment_.store(static_cast<long long>(alignment),
-                                      std::memory_order_relaxed);
+    m_last_allocated_num_bytes.store(static_cast<long long>(bytes),
+                                     std::memory_order_relaxed);
+    m_last_allocated_alignment.store(static_cast<long long>(alignment),
+                                     std::memory_order_relaxed);
 
     // Note that we don't initialize the user portion of the segment because
     // that would undermine Purify's 'UMR: uninitialized memory read' checking.
@@ -476,32 +475,32 @@ void *test_resource::do_allocate(std::size_t bytes, std::size_t alignment)
     std::memset((char *)(head + 1) + bytes,
                 std::to_integer<unsigned char>(paddedMemoryByte), paddingSize);
 
-    head->m_object_.m_bytes_        = bytes;
-    head->m_object_.m_alignment_    = alignment;
-    head->m_object_.m_magic_number_ = allocatedMemoryPattern;
-    head->m_object_.m_index_        = allocationIndex;
+    head->m_object.m_bytes        = bytes;
+    head->m_object.m_alignment    = alignment;
+    head->m_object.m_magic_number = allocatedMemoryPattern;
+    head->m_object.m_index        = allocationIndex;
 
-    m_blocks_in_use_.fetch_add(1, std::memory_order_relaxed);
+    m_blocks_in_use.fetch_add(1, std::memory_order_relaxed);
     if (max_blocks() < blocks_in_use()) {
-        m_max_blocks_.store(blocks_in_use(), std::memory_order_relaxed);
+        m_max_blocks.store(blocks_in_use(), std::memory_order_relaxed);
     }
-    m_total_blocks_.fetch_add(1, std::memory_order_relaxed);
+    m_total_blocks.fetch_add(1, std::memory_order_relaxed);
 
-    m_bytes_in_use_.fetch_add(static_cast<long long>(bytes),
-                              std::memory_order_relaxed);
-    if (max_bytes() < bytes_in_use()) {
-        m_max_bytes_.store(bytes_in_use(), std::memory_order_relaxed);
-    }
-    m_total_bytes_.fetch_add(static_cast<long long>(bytes),
+    m_bytes_in_use.fetch_add(static_cast<long long>(bytes),
                              std::memory_order_relaxed);
+    if (max_bytes() < bytes_in_use()) {
+        m_max_bytes.store(bytes_in_use(), std::memory_order_relaxed);
+    }
+    m_total_bytes.fetch_add(static_cast<long long>(bytes),
+                            std::memory_order_relaxed);
 
-    Link *link = addLink(m_list_, allocationIndex, m_pmr_);
-    head->m_object_.m_address_ = link;
-    head->m_object_.m_pmr_     = this;
+    Link *link = addLink(m_list, allocationIndex, m_pmr);
+    head->m_object.m_address = link;
+    head->m_object.m_pmr     = this;
 
     void *address = ++head;
 
-    m_last_allocated_address_.store(address, std::memory_order_relaxed);
+    m_last_allocated_address.store(address, std::memory_order_relaxed);
 
     if (is_verbose()) {
 
@@ -512,9 +511,9 @@ void *test_resource::do_allocate(std::size_t bytes, std::size_t alignment)
 
         std::printf("test_resource");
 
-        if (!m_name_.empty()) {
+        if (!m_name.empty()) {
             std::printf(" %.*s",
-                        static_cast<int>(m_name_.length()), m_name_.data());
+                        static_cast<int>(m_name.length()), m_name.data());
         }
 
         std::printf(" [%lld]: Allocated %zu byte%s(aligned %zu) at %p.\n",
@@ -534,14 +533,14 @@ void test_resource::do_deallocate(void        *p,
                                   std::size_t  bytes,
                                   std::size_t  alignment)
 {
-    std::lock_guard guard{ m_lock_ };
+    std::lock_guard guard{ m_lock };
 
-    m_deallocations_.fetch_add(1, std::memory_order_relaxed);
-    m_last_deallocated_address_.store(p, std::memory_order_relaxed);
+    m_deallocations.fetch_add(1, std::memory_order_relaxed);
+    m_last_deallocated_address.store(p, std::memory_order_relaxed);
 
     if (nullptr == p) {
         if (0 != bytes) {
-            m_bad_deallocate_params_.fetch_add(1, std::memory_order_relaxed);
+            m_bad_deallocate_params.fetch_add(1, std::memory_order_relaxed);
             if (!is_quiet()) {
                 formatBadBytesForNullptr(bytes, alignment);
                 if (!is_no_abort()) {
@@ -550,10 +549,10 @@ void test_resource::do_deallocate(void        *p,
             }
         }
         else {
-            m_last_deallocated_num_bytes_.store(0,
-                                                std::memory_order_relaxed);
-            m_last_deallocated_alignment_.store(alignment,
-                                                std::memory_order_relaxed);
+            m_last_deallocated_num_bytes.store(0,
+                                               std::memory_order_relaxed);
+            m_last_deallocated_alignment.store(alignment,
+                                               std::memory_order_relaxed);
         }
         return;                                                       // RETURN
     }
@@ -573,15 +572,15 @@ void test_resource::do_deallocate(void        *p,
     // that 'm_magic_number_' will not match the expected value, and so we will
     // skip the reading of 'm_bytes_' (a 64-bit integer).
 
-    if (allocatedMemoryPattern != head->m_object_.m_magic_number_) {
+    if (allocatedMemoryPattern != head->m_object.m_magic_number) {
         miscError = true;
     }
-    else if (this != head->m_object_.m_pmr_) {
+    else if (this != head->m_object.m_pmr) {
         miscError = true;
     }
     else {
-        size            = head->m_object_.m_bytes_;
-        allocationIndex = head->m_object_.m_index_;
+        size            = head->m_object.m_bytes;
+        allocationIndex = head->m_object.m_index;
     }
 
     // If there is evidence of corruption, this memory may have already been
@@ -600,7 +599,7 @@ void test_resource::do_deallocate(void        *p,
         // report the trashed byte nearest the segment.
 
         pcBegin = (std::byte *)p - 1;
-        pcEnd   = (std::byte *)&head->m_object_.m_padding_;
+        pcEnd   = (std::byte *)&head->m_object.m_padding;
 
         for (std::byte *pc = pcBegin; pcEnd <= pc; --pc) {
             if (paddedMemoryByte != *pc) {
@@ -623,7 +622,7 @@ void test_resource::do_deallocate(void        *p,
             }
         }
 
-        if (bytes != size || alignment != head->m_object_.m_alignment_) {
+        if (bytes != size || alignment != head->m_object.m_alignment) {
             paramError = true;
         }
     }
@@ -631,19 +630,19 @@ void test_resource::do_deallocate(void        *p,
     // Now check for corrupted memory block and cross allocation.
 
     if (!miscError && !overrunBy && !underrunBy &&!paramError) {
-        m_pmr_->deallocate(removeLink(m_list_,
-                                      head->m_object_.m_address_),
-                           sizeof(Link), alignof(Link));
+        m_pmr->deallocate(removeLink(m_list,
+                                     head->m_object.m_address),
+                          sizeof(Link), alignof(Link));
     }
     else { // Any error, count it, report it
         if (miscError) {
-            m_mismatches_.fetch_add(1, std::memory_order_relaxed);
+            m_mismatches.fetch_add(1, std::memory_order_relaxed);
         }
         if (paramError) {
-            m_bad_deallocate_params_.fetch_add(1, std::memory_order_relaxed);
+            m_bad_deallocate_params.fetch_add(1, std::memory_order_relaxed);
         }
         if (overrunBy || underrunBy) {
-            m_bounds_errors_.fetch_add(1, std::memory_order_relaxed);
+            m_bounds_errors.fetch_add(1, std::memory_order_relaxed);
         }
 
         if (is_quiet()) {
@@ -668,17 +667,17 @@ void test_resource::do_deallocate(void        *p,
     // construction.  In verbose mode, we also report the deallocation event to
     // 'stdout'.
 
-    m_last_deallocated_num_bytes_.store(static_cast<long long>(size),
-                                        std::memory_order_relaxed);
-    m_last_deallocated_alignment_.store(static_cast<long long>(alignment),
-                                        std::memory_order_relaxed);
+    m_last_deallocated_num_bytes.store(static_cast<long long>(size),
+                                       std::memory_order_relaxed);
+    m_last_deallocated_alignment.store(static_cast<long long>(alignment),
+                                       std::memory_order_relaxed);
 
-    m_blocks_in_use_.fetch_add(-1, std::memory_order_relaxed);
+    m_blocks_in_use.fetch_add(-1, std::memory_order_relaxed);
 
-    m_bytes_in_use_.fetch_add(-static_cast<long long>(size),
-                              std::memory_order_relaxed);
+    m_bytes_in_use.fetch_add(-static_cast<long long>(size),
+                             std::memory_order_relaxed);
 
-    head->m_object_.m_magic_number_ = deallocatedMemoryPattern;
+    head->m_object.m_magic_number = deallocatedMemoryPattern;
 
     std::memset(p, static_cast<int>(scribbledMemoryByte), size);
 
@@ -691,9 +690,9 @@ void test_resource::do_deallocate(void        *p,
 
         std::printf("test_resource");
 
-        if (!m_name_.empty()) {
+        if (!m_name.empty()) {
             std::printf(" %.*s",
-                        static_cast<int>(m_name_.length()), m_name_.data());
+                        static_cast<int>(m_name.length()), m_name.data());
         }
 
         std::printf(" [%lld]: Deallocated %zu byte%s(aligned %zu) at %p.\n",
@@ -706,7 +705,7 @@ void test_resource::do_deallocate(void        *p,
         std::fflush(stdout);
     }
 
-    m_pmr_->deallocate(head, sizeof(AlignedHeader) + size + paddingSize);
+    m_pmr->deallocate(head, sizeof(AlignedHeader) + size + paddingSize);
 }
 
 bool test_resource::do_is_equal(const std::pmr::memory_resource& that)
@@ -717,14 +716,14 @@ bool test_resource::do_is_equal(const std::pmr::memory_resource& that)
 
 void test_resource::print() const noexcept
 {
-    std::lock_guard guard{ m_lock_ };
+    std::lock_guard guard{ m_lock };
 
-    if (!m_name_.empty()) {
+    if (!m_name.empty()) {
         std::printf("\n"
                     "==================================================\n"
                     "                TEST RESOURCE %.*s STATE\n"
                     "--------------------------------------------------\n",
-                    static_cast<int>(m_name_.length()), m_name_.data());
+                    static_cast<int>(m_name.length()), m_name.data());
     }
     else {
         std::printf("\n"
@@ -748,9 +747,9 @@ void test_resource::print() const noexcept
                 mismatches(),    bounds_errors(),
                 bad_deallocate_params());
 
-    if (m_list_->d_head_p) {
+    if (m_list->m_head_p) {
         std::printf(" Indices of Outstanding Memory Allocations:\n ");
-        printList(*m_list_);
+        printList(*m_list);
     }
     std::fflush(stdout);
 }
@@ -760,7 +759,7 @@ long long test_resource::status() const noexcept
     static const int memoryLeak = -1;
     static const int success = 0;
 
-    std::lock_guard guard{ m_lock_ };
+    std::lock_guard guard{ m_lock };
 
     const long long numErrors = mismatches() + bounds_errors() +
                                 bad_deallocate_params();

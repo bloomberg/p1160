@@ -19,40 +19,40 @@ struct test_resource_list;
 
 class test_resource : public std::pmr::memory_resource {
 
-    std::string_view           m_name_{};
+    std::string_view           m_name{};
                               
-    std::atomic_int            m_no_abort_flag_{ false };
-    std::atomic_int            m_quiet_flag_{ false };
-    std::atomic_int            m_verbose_flag_{ false };
-    std::atomic_llong          m_allocation_limit_{ -1 };
+    std::atomic_int            m_no_abort_flag{ false };
+    std::atomic_int            m_quiet_flag{ false };
+    std::atomic_int            m_verbose_flag{ false };
+    std::atomic_llong          m_allocation_limit{ -1 };
                               
-    std::atomic_llong          m_allocations_{ 0 };
-    std::atomic_llong          m_deallocations_{ 0 };
-    std::atomic_llong          m_mismatches_{ 0 };
-    std::atomic_llong          m_bounds_errors_{ 0 };
-    std::atomic_llong          m_bad_deallocate_params_{ 0 };
+    std::atomic_llong          m_allocations{ 0 };
+    std::atomic_llong          m_deallocations{ 0 };
+    std::atomic_llong          m_mismatches{ 0 };
+    std::atomic_llong          m_bounds_errors{ 0 };
+    std::atomic_llong          m_bad_deallocate_params{ 0 };
                               
-    std::atomic_llong          m_blocks_in_use_{ 0 };
-    std::atomic_llong          m_max_blocks_{ 0 };
-    std::atomic_llong          m_total_blocks_{ 0 };
+    std::atomic_llong          m_blocks_in_use{ 0 };
+    std::atomic_llong          m_max_blocks{ 0 };
+    std::atomic_llong          m_total_blocks{ 0 };
                               
-    std::atomic_size_t         m_bytes_in_use_{ 0 };
-    std::atomic_llong          m_max_bytes_{ 0 };
-    std::atomic_size_t         m_total_bytes_{ 0 };
+    std::atomic_size_t         m_bytes_in_use{ 0 };
+    std::atomic_llong          m_max_bytes{ 0 };
+    std::atomic_size_t         m_total_bytes{ 0 };
                               
-    std::atomic_size_t         m_last_allocated_num_bytes_{ 0 };
-    std::atomic_size_t         m_last_allocated_alignment_{ 0 };
-    std::atomic<void *>        m_last_allocated_address_{ nullptr };
+    std::atomic_size_t         m_last_allocated_num_bytes{ 0 };
+    std::atomic_size_t         m_last_allocated_alignment{ 0 };
+    std::atomic<void *>        m_last_allocated_address{ nullptr };
                               
-    std::atomic_size_t         m_last_deallocated_num_bytes_{ 0 };
-    std::atomic_size_t         m_last_deallocated_alignment_{ 0 };
-    std::atomic<void *>        m_last_deallocated_address_{ nullptr };
+    std::atomic_size_t         m_last_deallocated_num_bytes{ 0 };
+    std::atomic_size_t         m_last_deallocated_alignment{ 0 };
+    std::atomic<void *>        m_last_deallocated_address{ nullptr };
                               
-    test_resource_list        *m_list_{};
+    test_resource_list        *m_list{};
                               
-    mutable std::mutex         m_lock_{};
+    mutable std::mutex         m_lock{};
 
-    std::pmr::memory_resource *m_pmr_{};
+    std::pmr::memory_resource *m_pmr{};
 
 private:
     [[nodiscard]] void *do_allocate(std::size_t bytes,
@@ -94,137 +94,138 @@ public:
 
     void set_allocation_limit(long long limit) noexcept
     {
-        m_allocation_limit_.store(limit, std::memory_order_relaxed);
+        m_allocation_limit.store(limit, std::memory_order_relaxed);
     }
 
     void set_no_abort(bool is_no_abort) noexcept
     {
-        m_no_abort_flag_.store(is_no_abort, std::memory_order_relaxed);
+        m_no_abort_flag.store(is_no_abort, std::memory_order_relaxed);
     }
 
     void set_quiet(bool is_quiet) noexcept
     {
-        m_quiet_flag_.store(is_quiet, std::memory_order_relaxed);
+        m_quiet_flag.store(is_quiet, std::memory_order_relaxed);
     }
 
     void set_verbose(bool is_verbose) noexcept
     {
-        m_verbose_flag_.store(is_verbose, std::memory_order_relaxed);
+        m_verbose_flag.store(is_verbose, std::memory_order_relaxed);
+        m_verbose_flag.store(is_verbose, std::memory_order_relaxed);
     }
 
     long long allocation_limit() const noexcept
     {
-        return m_allocation_limit_.load(std::memory_order_relaxed);
+        return m_allocation_limit.load(std::memory_order_relaxed);
     }
 
     bool is_no_abort() const noexcept
     {
-        return m_no_abort_flag_.load(std::memory_order_relaxed);
+        return m_no_abort_flag.load(std::memory_order_relaxed);
     }
 
     bool is_quiet() const noexcept
     {
-        return m_quiet_flag_.load(std::memory_order_relaxed);
+        return m_quiet_flag.load(std::memory_order_relaxed);
     }
 
     bool is_verbose() const noexcept
     {
-        return m_verbose_flag_.load(std::memory_order_relaxed);
+        return m_verbose_flag.load(std::memory_order_relaxed);
     }
 
     std::string_view name() const noexcept
     {
-        return m_name_;
+        return m_name;
     }
 
     std::pmr::memory_resource *upstream_resource() const noexcept
     {
-        return m_pmr_;
+        return m_pmr;
     }
 
     void *last_allocated_address() const noexcept
     {
-        return m_last_allocated_address_.load(std::memory_order_relaxed);
+        return m_last_allocated_address.load(std::memory_order_relaxed);
     }
 
     std::size_t last_allocated_num_bytes() const noexcept
     {
-        return m_last_allocated_num_bytes_.load(std::memory_order_relaxed);
+        return m_last_allocated_num_bytes.load(std::memory_order_relaxed);
     }
 
     std::size_t last_allocated_aligment() const noexcept
     {
-        return m_last_allocated_alignment_.load(std::memory_order_relaxed);
+        return m_last_allocated_alignment.load(std::memory_order_relaxed);
     }
 
     void *last_deallocated_address() const noexcept
     {
-        return m_last_deallocated_address_.load(std::memory_order_relaxed);
+        return m_last_deallocated_address.load(std::memory_order_relaxed);
     }
 
     std::size_t last_deallocated_num_bytes() const noexcept
     {
-        return m_last_deallocated_num_bytes_.load(std::memory_order_relaxed);
+        return m_last_deallocated_num_bytes.load(std::memory_order_relaxed);
     }
 
     std::size_t last_deallocated_aligment() const noexcept
     {
-        return m_last_deallocated_alignment_.load(std::memory_order_relaxed);
+        return m_last_deallocated_alignment.load(std::memory_order_relaxed);
     }
 
     long long allocations() const noexcept
     {
-        return m_allocations_.load(std::memory_order_relaxed);
+        return m_allocations.load(std::memory_order_relaxed);
     }
 
     long long deallocations() const noexcept
     {
-        return m_deallocations_.load(std::memory_order_relaxed);
+        return m_deallocations.load(std::memory_order_relaxed);
     }
 
     long long blocks_in_use() const noexcept
     {
-        return m_blocks_in_use_.load(std::memory_order_relaxed);
+        return m_blocks_in_use.load(std::memory_order_relaxed);
     }
 
     long long max_blocks() const noexcept
     {
-        return m_max_blocks_.load(std::memory_order_relaxed);
+        return m_max_blocks.load(std::memory_order_relaxed);
     }
 
     long long total_blocks() const noexcept
     {
-        return m_total_blocks_.load(std::memory_order_relaxed);
+        return m_total_blocks.load(std::memory_order_relaxed);
     }
 
     long long bounds_errors() const noexcept
     {
-        return m_bounds_errors_.load(std::memory_order_relaxed);
+        return m_bounds_errors.load(std::memory_order_relaxed);
     }
 
     long long bad_deallocate_params() const noexcept
     {
-        return m_bad_deallocate_params_.load(std::memory_order_relaxed);
+        return m_bad_deallocate_params.load(std::memory_order_relaxed);
     }
 
     long long bytes_in_use() const noexcept
     {
-        return m_bytes_in_use_.load(std::memory_order_relaxed);
+        return m_bytes_in_use.load(std::memory_order_relaxed);
     }
 
     long long max_bytes() const noexcept
     {
-        return m_max_bytes_.load(std::memory_order_relaxed);
+        return m_max_bytes.load(std::memory_order_relaxed);
     }
 
     long long total_bytes() const noexcept
     {
-        return m_total_bytes_.load(std::memory_order_relaxed);
+        return m_total_bytes.load(std::memory_order_relaxed);
     }
 
     long long mismatches() const noexcept
     {
-        return m_mismatches_.load(std::memory_order_relaxed);
+        return m_mismatches.load(std::memory_order_relaxed);
     }
 
     void print() const noexcept;
@@ -246,17 +247,17 @@ public:
 
 class test_resource_exception : public std::bad_alloc {
 
-    test_resource *m_originating_;
-    std::size_t    m_size_;
-    std::size_t    m_alignment_;
+    test_resource *m_originating;
+    std::size_t    m_size;
+    std::size_t    m_alignment;
 
   public:
     test_resource_exception(test_resource *originating,
                             std::size_t    size,
                             std::size_t    alignment) noexcept
-    : m_originating_(originating)
-    , m_size_(size)
-    , m_alignment_(alignment)
+    : m_originating(originating)
+    , m_size(size)
+    , m_alignment(alignment)
     {
     }
 
@@ -267,31 +268,31 @@ class test_resource_exception : public std::bad_alloc {
 
     test_resource *originating_resource() const noexcept
     {
-        return m_originating_;
+        return m_originating;
     }
 
     std::size_t size() const noexcept
     {
-        return m_size_;
+        return m_size;
     }
 
     std::size_t alignment() const noexcept
     {
-        return m_alignment_;
+        return m_alignment;
     }
 };
 
 
 class test_resource_monitor {
 
-    long long            m_initial_in_use_;
-    long long            m_initial_max_;
-    long long            m_initial_total_;
-    const test_resource& m_monitored_;
+    long long            m_initial_in_use;
+    long long            m_initial_max;
+    long long            m_initial_total;
+    const test_resource& m_monitored;
 
   public:
     explicit test_resource_monitor(const test_resource& monitored) noexcept
-    : m_monitored_(monitored)
+    : m_monitored(monitored)
     {
         reset();
     }
@@ -300,59 +301,59 @@ class test_resource_monitor {
 
     void reset() noexcept
     {
-        m_initial_in_use_ = m_monitored_.blocks_in_use();
-        m_initial_max_    = m_monitored_.max_blocks();
-        m_initial_total_  = m_monitored_.total_blocks();
+        m_initial_in_use = m_monitored.blocks_in_use();
+        m_initial_max    = m_monitored.max_blocks();
+        m_initial_total  = m_monitored.total_blocks();
     }
 
     bool is_in_use_down() const noexcept
     {
-        return m_monitored_.blocks_in_use() < m_initial_in_use_;
+        return m_monitored.blocks_in_use() < m_initial_in_use;
     }
 
     bool is_in_use_same() const noexcept
     {
-        return m_monitored_.blocks_in_use() == m_initial_in_use_;
+        return m_monitored.blocks_in_use() == m_initial_in_use;
     }
 
     bool is_in_use_up() const noexcept
     {
-        return m_monitored_.blocks_in_use() > m_initial_in_use_;
+        return m_monitored.blocks_in_use() > m_initial_in_use;
     }
 
     bool is_max_same() const noexcept
     {
-        return m_initial_max_ == m_monitored_.max_blocks();
+        return m_initial_max == m_monitored.max_blocks();
     }
 
     bool is_max_up() const noexcept
     {
-        return m_monitored_.max_blocks() != m_initial_max_;
+        return m_monitored.max_blocks() != m_initial_max;
     }
 
     bool is_total_same() const noexcept
     {
-        return m_monitored_.total_blocks() == m_initial_total_;
+        return m_monitored.total_blocks() == m_initial_total;
     }
 
     bool is_total_up() const noexcept
     {
-        return m_monitored_.total_blocks() != m_initial_total_;
+        return m_monitored.total_blocks() != m_initial_total;
     }
 
     long long delta_blocks_in_use() const noexcept
     {
-        return m_monitored_.blocks_in_use() - m_initial_in_use_;
+        return m_monitored.blocks_in_use() - m_initial_in_use;
     }
 
     long long delta_max_blocks() const noexcept
     {
-        return m_monitored_.max_blocks() - m_initial_max_;
+        return m_monitored.max_blocks() - m_initial_max;
     }
 
     long long delta_total_blocks() const noexcept
     {
-        return m_monitored_.total_blocks() - m_initial_total_;
+        return m_monitored.total_blocks() - m_initial_total;
     }
 };
 
