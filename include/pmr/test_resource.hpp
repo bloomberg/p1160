@@ -68,27 +68,21 @@ public:
     test_resource(const test_resource&) = delete;
     test_resource& operator=(const test_resource&) = delete;
 
-    test_resource();
     explicit test_resource(std::pmr::memory_resource *pmrp);
     
-    explicit test_resource(std::string_view  name);
-    explicit test_resource(const char       *name);
+    test_resource(std::string_view           name,
+                  std::pmr::memory_resource *pmrp = nullptr);
+    test_resource(const char                *name,
+                  std::pmr::memory_resource *pmrp = nullptr);
     
-    explicit test_resource(bool verbose);
+    test_resource(bool verbose, std::pmr::memory_resource *pmrp = nullptr);
     
-    test_resource(std::string_view  name, std::pmr::memory_resource *pmrp);
-    test_resource(const char       *name, std::pmr::memory_resource *pmrp);
-    
-    test_resource(bool verbose, std::pmr::memory_resource *pmrp);
-    
-    test_resource(const char       *name, bool verbose);
-    test_resource(std::string_view  name, bool verbose);
     test_resource(std::string_view           name,
                   bool                       verbose,
-                  std::pmr::memory_resource *pmrp);
+                  std::pmr::memory_resource *pmrp = nullptr);
     test_resource(const char                *name,
                   bool                       verbose,
-                  std::pmr::memory_resource *pmrp);
+                  std::pmr::memory_resource *pmrp = nullptr);
 
     ~test_resource();
 

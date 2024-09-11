@@ -327,29 +327,8 @@ std::pmr::memory_resource* local_malloc_free_resource()
     return &instance;
 }
 
-
-test_resource::test_resource()
-: test_resource(std::string_view{}, false)
-{
-}
-
 test_resource::test_resource(std::pmr::memory_resource *pmrp)
 : test_resource(std::string_view{}, false, pmrp)
-{
-}
-
-test_resource::test_resource(std::string_view name)
-: test_resource(name, false)
-{
-}
-
-test_resource::test_resource(const char *name)
-: test_resource(std::string_view(name), false)
-{
-}
-
-test_resource::test_resource(bool verbose)
-: test_resource(std::string_view{}, verbose)
 {
 }
 
@@ -369,22 +348,12 @@ test_resource::test_resource(bool verbose, memory_resource *pmrp)
 {
 }
 
-test_resource::test_resource(std::string_view name, bool verbose)
-: test_resource(name, verbose, local_malloc_free_resource())
-{
-}
-
-test_resource::test_resource(const char *name, bool verbose)
-: test_resource(std::string_view(name), verbose, local_malloc_free_resource())
-{
-}
-
 test_resource::test_resource(std::string_view           name,
                              bool                       verbose,
                              std::pmr::memory_resource *pmrp)
 : m_name(name)
 , m_verbose_flag(verbose)
-, m_pmr(pmrp)
+, m_pmr(pmrp ? pmrp : local_malloc_free_resource())
 {
     m_list = (test_resource_list *)m_pmr->allocate(sizeof(test_resource_list));
     m_list->m_head_p = nullptr;
