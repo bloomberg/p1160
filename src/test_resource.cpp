@@ -328,7 +328,7 @@ std::pmr::memory_resource* local_malloc_free_resource()
 }
 
 test_resource::test_resource(std::pmr::memory_resource *pmrp)
-: test_resource(std::string_view{}, false, pmrp)
+: test_resource(false, pmrp)
 {
 }
 
@@ -339,7 +339,7 @@ test_resource::test_resource(std::string_view           name,
 }
 
 test_resource::test_resource(const char *name, std::pmr::memory_resource *pmrp)
-: test_resource(std::string_view(name), false, pmrp)
+: test_resource(std::string_view{name}, false, pmrp)
 {
 }
 
@@ -348,23 +348,23 @@ test_resource::test_resource(bool verbose, memory_resource *pmrp)
 {
 }
 
+test_resource::test_resource(const char                *name,
+                             bool                       verbose,
+                             std::pmr::memory_resource *pmrp)
+: test_resource(std::string_view(name), verbose, pmrp)
+{
+}
+
 test_resource::test_resource(std::string_view           name,
                              bool                       verbose,
                              std::pmr::memory_resource *pmrp)
-: m_name(name)
+: m_name(name, local_malloc_free_resource())
 , m_verbose_flag(verbose)
 , m_pmr(pmrp ? pmrp : local_malloc_free_resource())
 {
     m_list = (test_resource_list *)m_pmr->allocate(sizeof(test_resource_list));
     m_list->m_head_p = nullptr;
     m_list->m_tail_p = nullptr;
-}
-
-test_resource::test_resource(const char                *name,
-                             bool                       verbose,
-                             std::pmr::memory_resource *pmrp)
-: test_resource(std::string_view(name), verbose, pmrp)
-{
 }
 
 test_resource::~test_resource()
@@ -408,8 +408,7 @@ void *test_resource::do_allocate(std::size_t bytes, std::size_t alignment)
 {
     std::lock_guard guard{ m_lock };
 
-    long long allocationIndex = 
-                         m_allocations.fetch_add(1, std::memory_order_relaxed);
+    m_allocate_calls.fetch_add(1, std::memory_order_relaxed);
 
     if (alignment > alignof(std::max_align_t)) {
         // Over-aligned allocations are not currently supported.
@@ -423,13 +422,13 @@ void *test_resource::do_allocate(std::size_t bytes, std::size_t alignment)
         }
     }
 
-    AlignedHeader *head = (AlignedHeader *)m_pmr->allocate(
-                                  sizeof(AlignedHeader) + bytes + paddingSize);
-    if (!head) {
-        // We cannot satisfy this request.  Throw 'std::bad_alloc'.
+    // The upstream resource will throw bad_alloc if it cannot fulfill
+    AlignedHeader *head = static_cast<AlignedHeader *>(m_pmr->allocate(
+                                   sizeof(AlignedHeader) + bytes + paddingSize,
+                                   alignof(AlignedHeader)));
 
-        throw std::bad_alloc();
-    }
+    long long allocationIndex = 
+                         m_allocations.fetch_add(1, std::memory_order_relaxed);
 
     m_last_allocated_num_bytes.store(static_cast<long long>(bytes),
                                      std::memory_order_relaxed);
@@ -504,27 +503,8 @@ void test_resource::do_deallocate(void        *p,
 {
     std::lock_guard guard{ m_lock };
 
-    m_deallocations.fetch_add(1, std::memory_order_relaxed);
+    m_deallocate_calls.fetch_add(1, std::memory_order_relaxed);
     m_last_deallocated_address.store(p, std::memory_order_relaxed);
-
-    if (nullptr == p) {
-        if (0 != bytes) {
-            m_bad_deallocate_params.fetch_add(1, std::memory_order_relaxed);
-            if (!is_quiet()) {
-                formatBadBytesForNullptr(bytes, alignment);
-                if (!is_no_abort()) {
-                    std::abort();                                      // ABORT
-                }
-            }
-        }
-        else {
-            m_last_deallocated_num_bytes.store(0,
-                                               std::memory_order_relaxed);
-            m_last_deallocated_alignment.store(alignment,
-                                               std::memory_order_relaxed);
-        }
-        return;                                                       // RETURN
-    }
 
     AlignedHeader *head = (AlignedHeader *)p - 1;
 
@@ -674,7 +654,10 @@ void test_resource::do_deallocate(void        *p,
         std::fflush(stdout);
     }
 
-    m_pmr->deallocate(head, sizeof(AlignedHeader) + size + paddingSize);
+    m_deallocations.fetch_add(1, std::memory_order_relaxed);
+    m_pmr->deallocate(head,
+                      sizeof(AlignedHeader) + size + paddingSize,
+                      alignof(AlignedHeader));
 }
 
 bool test_resource::do_is_equal(const std::pmr::memory_resource& that)

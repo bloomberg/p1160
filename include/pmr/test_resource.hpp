@@ -19,12 +19,15 @@ struct test_resource_list;
 
 class test_resource : public std::pmr::memory_resource {
 
-    std::string_view           m_name{};
+    std::pmr::string           m_name;
                               
     std::atomic_int            m_no_abort_flag{ false };
     std::atomic_int            m_quiet_flag{ false };
     std::atomic_int            m_verbose_flag{ false };
     std::atomic_llong          m_allocation_limit{ -1 };
+
+    std::atomic_llong          m_allocate_calls{ 0 };
+    std::atomic_llong          m_deallocate_calls{ 0 };
                               
     std::atomic_llong          m_allocations{ 0 };
     std::atomic_llong          m_deallocations{ 0 };
@@ -74,13 +77,12 @@ public:
                   std::pmr::memory_resource *pmrp = nullptr);
     test_resource(const char                *name,
                   std::pmr::memory_resource *pmrp = nullptr);
-    
-    test_resource(bool verbose, std::pmr::memory_resource *pmrp = nullptr);
-    
-    test_resource(std::string_view           name,
-                  bool                       verbose,
+    test_resource(bool                       verbose,
                   std::pmr::memory_resource *pmrp = nullptr);
     test_resource(const char                *name,
+                  bool                       verbose,
+                  std::pmr::memory_resource *pmrp = nullptr);
+    test_resource(std::string_view           name,
                   bool                       verbose,
                   std::pmr::memory_resource *pmrp = nullptr);
 
@@ -175,6 +177,16 @@ public:
     long long deallocations() const noexcept
     {
         return m_deallocations.load(std::memory_order_relaxed);
+    }
+
+    long long allocate_calls() const noexcept
+    {
+        return m_allocate_calls.load(std::memory_order_relaxed);
+    }
+
+    long long deallocate_calls() const noexcept
+    {
+        return m_deallocate_calls.load(std::memory_order_relaxed);
     }
 
     long long blocks_in_use() const noexcept
