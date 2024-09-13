@@ -14,19 +14,18 @@ void test(bool verbose)
     const char* longstr = "A very very long string that allocates memory";
 
     for (auto context : tpmr.exception_test_range()) {
-        std::pmr::deque<std::pmr::string> deq{ &tpmr };
+        std::pmr::deque<std::pmr::string> deq{ { "hello", "world"}, &tpmr};
         std::pmr::deque<std::pmr::string> orig{ deq };
 
         context.run_test([&]() mutable {
                 deq.emplace_back(longstr);
                 orig = deq;
                 deq.emplace_back(longstr);
+                ASSERT_EQ(deq.size(), 4);
             },
             [&](const beman::pmr::test_resource_exception&) {
                 ASSERT_EQ(deq.size(), orig.size());
             });
-
-        //ASSERT_EQ(deq.size(), 2);
     }
 }
 
