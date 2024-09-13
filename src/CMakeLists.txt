@@ -20,7 +20,7 @@ add_definitions (
 
 endif()
 
-add_library(pmr_test_resource test_resource.cpp)
+add_library(pmr_test_resource test_resource.cpp ../include/pmr/test_resource.hpp)
 
 target_include_directories(
   pmr_test_resource

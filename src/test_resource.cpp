@@ -427,7 +427,7 @@ void *test_resource::do_allocate(std::size_t bytes, std::size_t alignment)
                                    sizeof(AlignedHeader) + bytes + paddingSize,
                                    alignof(AlignedHeader)));
 
-    long long allocationIndex = 
+    long long allocationIndex =
                          m_allocations.fetch_add(1, std::memory_order_relaxed);
 
     m_last_allocated_num_bytes.store(static_cast<long long>(bytes),

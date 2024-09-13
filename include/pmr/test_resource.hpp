@@ -20,7 +20,7 @@ struct test_resource_list;
 class test_resource : public std::pmr::memory_resource {
 
     std::pmr::string           m_name;
-                              
+
     std::atomic_int            m_no_abort_flag{ false };
     std::atomic_int            m_quiet_flag{ false };
     std::atomic_int            m_verbose_flag{ false };
@@ -28,31 +28,31 @@ class test_resource : public std::pmr::memory_resource {
 
     std::atomic_llong          m_allocate_calls{ 0 };
     std::atomic_llong          m_deallocate_calls{ 0 };
-                              
+
     std::atomic_llong          m_allocations{ 0 };
     std::atomic_llong          m_deallocations{ 0 };
     std::atomic_llong          m_mismatches{ 0 };
     std::atomic_llong          m_bounds_errors{ 0 };
     std::atomic_llong          m_bad_deallocate_params{ 0 };
-                              
+
     std::atomic_llong          m_blocks_in_use{ 0 };
     std::atomic_llong          m_max_blocks{ 0 };
     std::atomic_llong          m_total_blocks{ 0 };
-                              
+
     std::atomic_size_t         m_bytes_in_use{ 0 };
     std::atomic_llong          m_max_bytes{ 0 };
     std::atomic_size_t         m_total_bytes{ 0 };
-                              
+
     std::atomic_size_t         m_last_allocated_num_bytes{ 0 };
     std::atomic_size_t         m_last_allocated_alignment{ 0 };
     std::atomic<void *>        m_last_allocated_address{ nullptr };
-                              
+
     std::atomic_size_t         m_last_deallocated_num_bytes{ 0 };
     std::atomic_size_t         m_last_deallocated_alignment{ 0 };
     std::atomic<void *>        m_last_deallocated_address{ nullptr };
-                              
+
     test_resource_list        *m_list{};
-                              
+
     mutable std::mutex         m_lock{};
 
     std::pmr::memory_resource *m_pmr{};
@@ -72,7 +72,7 @@ public:
     test_resource& operator=(const test_resource&) = delete;
 
     explicit test_resource(std::pmr::memory_resource *pmrp);
-    
+
     test_resource(std::string_view           name,
                   std::pmr::memory_resource *pmrp = nullptr);
     test_resource(const char                *name,
