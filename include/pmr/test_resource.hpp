@@ -17,6 +17,8 @@ namespace beman::pmr {
 
 struct test_resource_list;
 
+class test_resource_exception_test_range;
+
 class test_resource : public std::pmr::memory_resource {
 
     std::pmr::string           m_name;
@@ -87,6 +89,8 @@ public:
                   std::pmr::memory_resource *pmrp = nullptr);
 
     ~test_resource();
+
+    test_resource_exception_test_range exception_test_range() noexcept;
 
     void set_allocation_limit(long long limit) noexcept
     {
@@ -250,7 +254,6 @@ public:
     long long status() const noexcept;
 };
 
-
 class test_resource_exception : public std::bad_alloc {
 
     test_resource *m_originating;
@@ -288,6 +291,124 @@ class test_resource_exception : public std::bad_alloc {
     }
 };
 
+class test_resource_exception_test_sentinel {
+};
+
+class test_resource_exception_test_context {
+    test_resource* m_test_resource;
+    long long      m_original_limit;
+    long long      m_current_limit{ 0 };
+    bool           m_ended{ false };
+
+public:
+    explicit
+    test_resource_exception_test_context(test_resource* tested_resource)
+    : m_test_resource(tested_resource)
+    , m_original_limit(tested_resource->allocation_limit())
+    {
+    }
+
+    bool operator==(test_resource_exception_test_sentinel) const
+    {
+        return m_ended;
+    }
+
+    test_resource_exception_test_context& operator++()
+    {
+        ++m_current_limit;
+        m_ended = m_test_resource->allocation_limit() >= 0;
+        m_test_resource->set_allocation_limit(m_original_limit);
+        return *this;
+    }
+
+    test_resource_exception_test_context operator++(int)
+    {
+        test_resource_exception_test_context tmp{ *this };
+        ++m_current_limit;
+        return tmp;
+    }
+
+    test_resource_exception_test_context& operator*() {
+        return *this;
+    }
+
+    template <class TESTED_BLOCK>
+    bool run_test(TESTED_BLOCK tested_code);
+
+    template <class TESTED_BLOCK, class EXCEPTION_VERIFY_BLOCK>
+    bool run_test(TESTED_BLOCK           tested_code,
+                  EXCEPTION_VERIFY_BLOCK exception_verifier);
+};
+
+template <class TESTED_BLOCK>
+bool test_resource_exception_test_context::
+run_test(TESTED_BLOCK tested_code)
+{
+    return this->run_test(tested_code, [](const test_resource_exception&) {});
+}
+
+template <class TESTED_BLOCK,
+          class EXCEPTION_VERIFY_BLOCK>
+bool test_resource_exception_test_context::
+run_test(TESTED_BLOCK           tested_code,
+         EXCEPTION_VERIFY_BLOCK exception_verifier)
+{
+    m_test_resource->set_allocation_limit(m_current_limit);
+
+    try {
+        tested_code();
+    }
+    catch (const test_resource_exception& e) {
+        if (e.originating_resource() != m_test_resource) {
+            std::printf("\t*** test_resource_exception"
+                " from unexpected test resource: %p %.*s ***\n",
+                e.originating_resource(),
+                static_cast<int>(
+                    e.originating_resource()->name().length()),
+                e.originating_resource()->name().data());
+            throw;
+        }
+        else if (m_test_resource->is_verbose()) {
+            std::printf("\t*** test_resource_exception: "
+                "alloc limit = %lld, last alloc size = %zu, "
+                "align = %zu ***\n",
+                m_current_limit,
+                e.size(),
+                e.alignment());
+        }
+
+        exception_verifier(e);
+    }
+
+    return m_test_resource->allocation_limit() <= 0;
+}
+
+class test_resource_exception_test_range {
+    test_resource* m_test_resource;
+
+public:
+    explicit test_resource_exception_test_range(test_resource* tested_resource)
+        : m_test_resource(tested_resource)
+    {
+    }
+
+    test_resource_exception_test_context begin() const
+    {
+        return test_resource_exception_test_context{ m_test_resource };
+    }
+
+    test_resource_exception_test_sentinel end() const
+    {
+        return {};
+    }
+};
+
+inline
+test_resource_exception_test_range
+test_resource::exception_test_range() noexcept
+{
+    return test_resource_exception_test_range{ this };
+}
 
 class test_resource_monitor {
 
@@ -362,38 +483,6 @@ class test_resource_monitor {
         return m_monitored.total_blocks() - m_initial_total;
     }
 };
-
-
-template <class CODE_BLOCK>
-void exception_test_loop(test_resource& pmrp, CODE_BLOCK codeBlock)
-{
-    for (long long exceptionCounter = 0; true; ++exceptionCounter) {
-        try {
-            pmrp.set_allocation_limit(exceptionCounter);
-            codeBlock(pmrp);
-            pmrp.set_allocation_limit(-1);
-            return;
-        } catch (const test_resource_exception& e) {
-            if (e.originating_resource() != &pmrp) {
-                std::printf("\t*** test_resource_exception"
-                            " from unexpected test resource: %p %.*s ***\n",
-                            e.originating_resource(),
-                            static_cast<int>(
-                                         e.originating_resource()->name().length()),
-                            e.originating_resource()->name().data());
-                throw;
-            }
-            else if (pmrp.is_verbose()) {
-                std::printf("\t*** test_resource_exception: "
-                            "alloc limit = %lld, last alloc size = %zu, "
-                            "align = %zu ***\n",
-                            exceptionCounter,
-                            e.size(),
-                            e.alignment());
-            }
-        }
-    }
-}
 
 
 class [[maybe_unused]] default_resource_guard {
