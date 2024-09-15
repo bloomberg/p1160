@@ -294,11 +294,15 @@ class test_resource_exception : public std::bad_alloc {
 class test_resource_exception_test_sentinel {
 };
 
+class test_resource_exception_test_iterator;
+
 class test_resource_exception_test_context {
     test_resource* m_test_resource;
     long long      m_original_limit;
     long long      m_current_limit{ 0 };
     bool           m_ended{ false };
+
+    friend class test_resource_exception_test_iterator;
 
 public:
     explicit
@@ -308,29 +312,6 @@ public:
     {
     }
 
-    bool operator==(test_resource_exception_test_sentinel) const
-    {
-        return m_ended;
-    }
-
-    test_resource_exception_test_context& operator++()
-    {
-        ++m_current_limit;
-        m_ended = m_test_resource->allocation_limit() >= 0;
-        m_test_resource->set_allocation_limit(m_original_limit);
-        return *this;
-    }
-
-    test_resource_exception_test_context operator++(int)
-    {
-        test_resource_exception_test_context tmp{ *this };
-        ++m_current_limit;
-        return tmp;
-    }
-
-    test_resource_exception_test_context& operator*() {
-        return *this;
-    }
 
     template <class TESTED_BLOCK>
     bool run_test(TESTED_BLOCK tested_code);
@@ -383,6 +364,42 @@ run_test(TESTED_BLOCK           tested_code,
     return m_test_resource->allocation_limit() <= 0;
 }
 
+class test_resource_exception_test_iterator {
+    test_resource_exception_test_context m_context;
+
+public:
+    explicit
+    test_resource_exception_test_iterator(test_resource *tested_resource)
+    : m_context(tested_resource)
+    {
+    }
+
+    bool operator==(test_resource_exception_test_sentinel) const
+    {
+        return m_context.m_ended;
+    }
+
+    test_resource_exception_test_iterator& operator++()
+    {
+        ++(m_context.m_current_limit);
+        m_context.m_ended = m_context.m_test_resource->allocation_limit() >= 0;
+        m_context.m_test_resource->set_allocation_limit(
+                                                   m_context.m_original_limit);
+        return *this;
+    }
+
+    test_resource_exception_test_iterator operator++(int)
+    {
+        test_resource_exception_test_iterator tmp{ *this };
+        ++m_context.m_current_limit;
+        return tmp;
+    }
+
+    test_resource_exception_test_context& operator*() {
+        return m_context;
+    }
+};
+
 class test_resource_exception_test_range {
     test_resource* m_test_resource;
 
@@ -392,9 +409,9 @@ public:
     {
     }
 
-    test_resource_exception_test_context begin() const
+    test_resource_exception_test_iterator begin() const
     {
-        return test_resource_exception_test_context{ m_test_resource };
+        return test_resource_exception_test_iterator{ m_test_resource };
     }
 
     test_resource_exception_test_sentinel end() const
