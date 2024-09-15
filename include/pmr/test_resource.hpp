@@ -5,6 +5,7 @@
 #include <memory_resource>
 
 #include <atomic>
+#include <iterator>
 #include <mutex>
 #include <new>
 #include <stdexcept>
@@ -59,7 +60,7 @@ class test_resource : public std::pmr::memory_resource {
 
     std::pmr::memory_resource *m_pmr{};
 
-private:
+  private:
     [[nodiscard]] void *do_allocate(std::size_t bytes,
                                     std::size_t alignment) override;
 
@@ -69,7 +70,7 @@ private:
 
     bool do_is_equal(const memory_resource& that) const noexcept override;
 
-public:
+  public:
     test_resource(const test_resource&) = delete;
     test_resource& operator=(const test_resource&) = delete;
 
@@ -304,7 +305,7 @@ class test_resource_exception_test_context {
 
     friend class test_resource_exception_test_iterator;
 
-public:
+  public:
     explicit
     test_resource_exception_test_context(test_resource* tested_resource)
     : m_test_resource(tested_resource)
@@ -312,6 +313,13 @@ public:
     {
     }
 
+    bool operator==(const test_resource_exception_test_context& other) const
+    {
+        return other.m_test_resource  == m_test_resource
+            && other.m_original_limit == m_original_limit
+            && other.m_current_limit  == m_current_limit
+            && other.m_ended          == m_ended;
+    }
 
     template <class TESTED_BLOCK>
     bool run_test(TESTED_BLOCK tested_code);
@@ -367,7 +375,7 @@ run_test(TESTED_BLOCK           tested_code,
 class test_resource_exception_test_iterator {
     test_resource_exception_test_context m_context;
 
-public:
+  public:
     explicit
     test_resource_exception_test_iterator(test_resource *tested_resource)
     : m_context(tested_resource)
@@ -377,6 +385,11 @@ public:
     bool operator==(test_resource_exception_test_sentinel) const
     {
         return m_context.m_ended;
+    }
+
+    bool operator==(const test_resource_exception_test_iterator& other) const
+    {
+        return m_context == m_context;
     }
 
     test_resource_exception_test_iterator& operator++()
@@ -398,14 +411,18 @@ public:
     test_resource_exception_test_context& operator*() {
         return m_context;
     }
+
+    test_resource_exception_test_context* operator->() {
+        return &m_context;
+    }
 };
 
 class test_resource_exception_test_range {
     test_resource* m_test_resource;
 
-public:
+  public:
     explicit test_resource_exception_test_range(test_resource* tested_resource)
-        : m_test_resource(tested_resource)
+    : m_test_resource(tested_resource)
     {
     }
 
