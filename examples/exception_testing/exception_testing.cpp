@@ -17,7 +17,7 @@ void test(bool verbose)
         std::pmr::deque<std::pmr::string> deq{ { "hello", "world"}, &tpmr};
         std::pmr::deque<std::pmr::string> orig{ deq };
 
-        context.run_test([&]() mutable {
+        context.run_test([&]() {
                 deq.emplace_back(longstr);
                 orig = deq;
                 deq.emplace_back(longstr);
