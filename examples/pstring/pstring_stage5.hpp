@@ -65,11 +65,13 @@ pstring::~pstring()
 // ----------------------------------------------------------------------------
 // Copyright 2019 Bloomberg Finance L.P.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License") with the LLVM
+// exception (the "Exception"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License and the Exception at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
+//     
+//     https://spdx.org/licenses/LLVM-exception.html
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
