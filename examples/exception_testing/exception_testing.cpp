@@ -43,7 +43,7 @@ int main()
 // with the License.  You may obtain a copy of the License and the Exception at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
-//     
+//
 //     https://spdx.org/licenses/LLVM-exception.html
 //
 // Unless required by applicable law or agreed to in writing, software

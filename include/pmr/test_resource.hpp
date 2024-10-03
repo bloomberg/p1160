@@ -301,24 +301,24 @@ class test_resource_exception_test_context {
     test_resource* m_test_resource;
     long long      m_original_limit;
     long long      m_current_limit{ 0 };
-    bool           m_ended{ false };
 
     friend class test_resource_exception_test_iterator;
 
   public:
     explicit
     test_resource_exception_test_context(test_resource* tested_resource)
+                                                                       noexcept
     : m_test_resource(tested_resource)
     , m_original_limit(tested_resource->allocation_limit())
     {
     }
 
     bool operator==(const test_resource_exception_test_context& other) const
+                                                                       noexcept
     {
         return other.m_test_resource  == m_test_resource
             && other.m_original_limit == m_original_limit
-            && other.m_current_limit  == m_current_limit
-            && other.m_ended          == m_ended;
+            && other.m_current_limit  == m_current_limit;
     }
 
     template <class TESTED_BLOCK>
@@ -374,6 +374,7 @@ run_test(TESTED_BLOCK           tested_code,
 
 class test_resource_exception_test_iterator {
     test_resource_exception_test_context m_context;
+    bool                                 m_ended{ false };
 
   public:
     explicit
@@ -384,7 +385,7 @@ class test_resource_exception_test_iterator {
 
     bool operator==(test_resource_exception_test_sentinel) const
     {
-        return m_context.m_ended;
+        return m_ended;
     }
 
     bool operator==(const test_resource_exception_test_iterator& other) const
@@ -395,7 +396,7 @@ class test_resource_exception_test_iterator {
     test_resource_exception_test_iterator& operator++()
     {
         ++(m_context.m_current_limit);
-        m_context.m_ended = m_context.m_test_resource->allocation_limit() >= 0;
+        m_ended = m_context.m_test_resource->allocation_limit() >= 0;
         m_context.m_test_resource->set_allocation_limit(
                                                    m_context.m_original_limit);
         return *this;
@@ -626,7 +627,7 @@ public:
 // with the License.  You may obtain a copy of the License and the Exception at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
-//     
+//
 //     https://spdx.org/licenses/LLVM-exception.html
 //
 // Unless required by applicable law or agreed to in writing, software
